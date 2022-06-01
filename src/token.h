@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 enum class TokenType {
     None,
     Int,
@@ -8,8 +10,8 @@ enum class TokenType {
     Minus,
     Mul,
     Div,
-    LParen,
-    RParen
+    LeftParen,
+    RightParen
 };
 
 class Token {
@@ -27,3 +29,5 @@ public:
     TokenType type = TokenType::None;
     Value value;
 };
+
+std::ostream& operator<<(std::ostream& stream, const Token& token);

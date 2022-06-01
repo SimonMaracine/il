@@ -3,13 +3,14 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <utility>
 
 #include "token.h"
 
 class Lexer {
 public:
-    Lexer(const std::string& text)
-        : text(text) {}
+    Lexer(std::string&& text)
+        : text(std::move(text)) {}
     ~Lexer() = default;
 
     std::vector<Token> tokenize();    

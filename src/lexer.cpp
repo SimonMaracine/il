@@ -36,11 +36,11 @@ std::vector<Token> Lexer::tokenize() {
                 advance();
                 break;
             case '(':
-                tokens.push_back(Token(TokenType::LParen));
+                tokens.push_back(Token(TokenType::LeftParen));
                 advance();
                 break;
             case ')':
-                tokens.push_back(Token(TokenType::RParen));
+                tokens.push_back(Token(TokenType::RightParen));
                 advance();
                 break;
             case '0':
@@ -56,6 +56,9 @@ std::vector<Token> Lexer::tokenize() {
                 tokens.push_back(build_number());
                 advance();
                 break;
+            default:
+                std::cout << "Invalid character" << std::endl;
+                exit(1);
         }
     }
 
@@ -107,13 +110,15 @@ Token Lexer::build_number() {
     }
 
     out_of_loop:
-    Token number;
+    Token token;
 
     if (dot_count == 0) {
-        number.value.integer = std::stoi(number_string);
-        return number;
+        token.type = TokenType::Int;
+        token.value.integer = std::stoi(number_string);
+        return token;
     } else {
-        number.value.real = std::stof(number_string);
-        return number;
+        token.type = TokenType::Float;
+        token.value.real = std::stof(number_string);
+        return token;
     }
 }
