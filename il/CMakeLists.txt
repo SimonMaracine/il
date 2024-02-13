@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
 add_executable(il
+    "src/context.cpp"
+    "src/context.hpp"
     "src/interpreter.cpp"
     "src/interpreter.hpp"
     "src/main.cpp"

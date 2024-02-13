@@ -14,7 +14,7 @@ void IlInterpreter::run_file(const std::string& file_path) {
 
     run(*contents);
 
-    if (had_error) {
+    if (ctx.had_error) {
         // FIXME error
     }
 }
@@ -42,12 +42,12 @@ void IlInterpreter::run_repl() {
 
         run(line);
 
-        had_error = false;
+        ctx.had_error = false;
     }
 }
 
 void IlInterpreter::run(const std::string& source_code) {
-    Scanner scanner {source_code};
+    Scanner scanner {source_code, ctx};
     const auto tokens {scanner.scan()};
 
     for (Token token : tokens) {
@@ -74,13 +74,4 @@ std::optional<std::string> IlInterpreter::read_file(const std::string& file_path
     delete[] buffer;
 
     return contents;
-}
-
-void IlInterpreter::report(std::size_t line, const std::string& where, const std::string& message) {
-    std::cout << "[line " << line << "] Error" << where << ": " << message;
-    had_error = true;
-}
-
-void IlInterpreter::error(std::size_t line, const std::string& message) {
-    report(line, "", message);
 }
