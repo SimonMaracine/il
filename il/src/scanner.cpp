@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <utility>
+#include <unordered_map>
 
 std::vector<Token> Scanner::scan() {
     while (!reached_end()) {
@@ -97,7 +98,11 @@ void Scanner::scan_token() {
             line++;
             break;
         default:
-            ctx.error(line, "Unexpected character");
+            if (is_alpha(character)) {
+                identifier();
+            } else {
+                ctx.error(line, "Unexpected character");
+            }
     }
 }
 
@@ -154,6 +159,26 @@ bool Scanner::is_digit(char character) {
     return character >= '0' && character <= '9';
 }
 
+bool Scanner::is_alpha(char character) {
+    if (character >= 'A' && character <= 'Z') {
+        return true;
+    }
+
+    if (character >= 'a' && character <= 'z') {
+        return true;
+    }
+
+    if (character == '_') {
+        return true;
+    }
+
+    return false;
+}
+
+bool Scanner::is_alpha_numeric(char character) {
+    return is_alpha(character) || is_digit(character);
+}
+
 void Scanner::string() {
     while (peek() != '"' && !reached_end()) {
         if (peek() == '\n') {
@@ -191,6 +216,30 @@ void Scanner::number() {
     add_token(TokenType::Number, parse_double(source_code.substr(start, current - start)));
 }
 
+void Scanner::identifier() {
+    while (is_alpha_numeric(peek())) {
+        advance();
+    }
+
+    static const std::unordered_map<std::string, TokenType> KEYWORDS {
+        { "let", TokenType::Let },
+        { "true", TokenType::True },
+        { "false", TokenType::False },
+        { "null", TokenType::Null },
+        { "or", TokenType::Or },
+        { "and", TokenType::And }
+    };
+
+    const auto word {source_code.substr(start, current - start)};
+
+    if (KEYWORDS.find(word) != KEYWORDS.cend()) {
+        add_token(KEYWORDS.at(word));
+        return;
+    }
+
+    add_token(TokenType::Identifier);
+}
+
 double Scanner::parse_double(const std::string& string) {
     double result {};
 
@@ -199,7 +248,7 @@ double Scanner::parse_double(const std::string& string) {
     } catch (const std::invalid_argument&) {
         assert(false);
     } catch (const std::out_of_range&) {
-        ctx.error(line, "Number otu of range");
+        ctx.error(line, "Number out of range");
         return 0.0;
     }
 

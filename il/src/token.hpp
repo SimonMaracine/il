@@ -24,10 +24,10 @@ enum class TokenType {
     Minus, Plus, Slash, Star,
 
     // Relational operators
-    Bang, BangEqual, Greater, GreaterEqual, Less, LessEqual, Equal, EqualEqual
+    Bang, BangEqual, Greater, GreaterEqual, Less, LessEqual, Equal, EqualEqual,
 
     // Keywords
-    // TODO
+    Let, True, False, Null, Or, And
 };
 
 class Token {
@@ -117,6 +117,30 @@ inline std::ostream& operator<<(std::ostream& stream, const TokenType token_type
         case TokenType::LessEqual:
             stream << "LessEqual";
             break;
+        case TokenType::Equal:
+            stream << "Equal";
+            break;
+        case TokenType::EqualEqual:
+            stream << "EqualEqual";
+            break;
+        case TokenType::Let:
+            stream << "Let";
+            break;
+        case TokenType::True:
+            stream << "True";
+            break;
+        case TokenType::False:
+            stream << "False";
+            break;
+        case TokenType::Null:
+            stream << "Null";
+            break;
+        case TokenType::Or:
+            stream << "Or";
+            break;
+        case TokenType::And:
+            stream << "And";
+            break;
     }
 
     return stream;
@@ -128,6 +152,9 @@ inline std::ostream& operator<<(std::ostream& stream, const Token& token) {
     switch (token.type) {
         case TokenType::String:
             stream << ' ' << std::get<0u>(token.literal);
+            break;
+        case TokenType::Number:
+            stream << ' ' << std::get<1u>(token.literal);
             break;
         default:
             break;

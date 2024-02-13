@@ -24,8 +24,11 @@ private:
     char peekTwo();
     bool reached_end();
     bool is_digit(char character);
+    bool is_alpha(char character);
+    bool is_alpha_numeric(char character);
     void string();
     void number();
+    void identifier();
     double parse_double(const std::string& string);
 
     std::string source_code;

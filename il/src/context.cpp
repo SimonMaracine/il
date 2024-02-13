@@ -3,7 +3,7 @@
 #include <iostream>
 
 void Context::report(std::size_t line, const std::string& where, const std::string& message) {
-    std::cout << "[line " << line << "] Error" << where << ": " << message;
+    std::cout << "[line " << line << "] Error" << where << ": " << message << '\n';
     had_error = true;
 }
 
