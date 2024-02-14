@@ -5,11 +5,11 @@
 #include <ostream>
 #include <variant>
 #include <utility>
+#include <cassert>
 
 enum class TokenType {
     // Miscellaneous
-    None,
-    Eof,
+    None, Eof,
 
     // Literals
     Identifier, String, Number,
@@ -23,28 +23,41 @@ enum class TokenType {
     // Math operators
     Minus, Plus, Slash, Star,
 
-    // Relational operators
-    Bang, BangEqual, Greater, GreaterEqual, Less, LessEqual, Equal, EqualEqual,
+    // Relational and logic operators
+    BangEqual, Greater, GreaterEqual, Less, LessEqual, EqualEqual,
 
     // Keywords
-    Let, True, False, Null, Or, And
+    Let, True, False, Null, Or, And,
+
+    // Other
+    Bang, Equal
 };
 
 class Token {
 public:
+    // Token() = default;  // FIXME ?
+
     Token(TokenType type, const std::string& lexeme, std::size_t line)
         : type(type), line(line), lexeme(lexeme) {}
 
     Token(TokenType type, const std::string& lexeme, std::size_t line, std::string&& value)
-        : type(type), line(line), lexeme(lexeme), literal(std::move(value)) {}
+        : type(type), line(line), lexeme(lexeme), literal(std::move(value)) {
+        assert(type == TokenType::String);
+    }
 
     Token(TokenType type, const std::string& lexeme, std::size_t line, double value)
-        : type(type), line(line), lexeme(lexeme), literal(value) {}
+        : type(type), line(line), lexeme(lexeme), literal(value) {
+        assert(type == TokenType::Number);
+    }
+
+    const std::string& get_lexeme() const { return lexeme; }
 private:
+    struct None {};
+
     TokenType type {};
     std::size_t line {};
     std::string lexeme;
-    std::variant<std::string, double> literal;
+    std::variant<None, std::string, double> literal;
 
     friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 };
@@ -151,10 +164,10 @@ inline std::ostream& operator<<(std::ostream& stream, const Token& token) {
 
     switch (token.type) {
         case TokenType::String:
-            stream << ' ' << std::get<0u>(token.literal);
+            stream << ' ' << std::get<1u>(token.literal);
             break;
         case TokenType::Number:
-            stream << ' ' << std::get<1u>(token.literal);
+            stream << ' ' << std::get<2u>(token.literal);
             break;
         default:
             break;
