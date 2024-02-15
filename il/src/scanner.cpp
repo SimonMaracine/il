@@ -101,7 +101,7 @@ void Scanner::scan_token() {
             if (is_alpha(character)) {
                 identifier();
             } else {
-                ctx.error(line, "Unexpected character");
+                ctx.error(line, std::string("Unexpected character: `") + character + "`");
             }
     }
 }
@@ -196,7 +196,7 @@ void Scanner::string() {
     // Consume the closing quote
     advance();
 
-    add_token(TokenType::String, source_code.substr(start + 1u, current - start - 1u));
+    add_token(TokenType::String, source_code.substr(start + 1u, current - start - 2u));
 }
 
 void Scanner::number() {
