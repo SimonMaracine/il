@@ -8,6 +8,8 @@ add_executable(il
     "src/interpreter.cpp"
     "src/interpreter.hpp"
     "src/main.cpp"
+    "src/parser.cpp"
+    "src/parser.hpp"
     "src/scanner.cpp"
     "src/scanner.hpp"
     "src/token.hpp"

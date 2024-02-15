@@ -50,6 +50,8 @@ public:
         assert(type == TokenType::Number);
     }
 
+    TokenType get_type() const { return type; };
+    std::size_t get_line() const { return line; };
     const std::string& get_lexeme() const { return lexeme; }
 private:
     struct None {};

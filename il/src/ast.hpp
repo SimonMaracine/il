@@ -38,7 +38,7 @@ struct Expr {
 
 template<typename R>
 struct Literal : Expr<R> {
-    std::shared_ptr<Expr<R>> accept(Visitor<R>* visitor) override {
+    R accept(Visitor<R>* visitor) override {
         return visitor->visit(this);
     }
 
@@ -47,7 +47,10 @@ struct Literal : Expr<R> {
 
 template<typename R>
 struct Grouping : Expr<R> {
-    std::shared_ptr<Expr<R>> accept(Visitor<R>* visitor) override {
+    Grouping(std::shared_ptr<Expr<R>> expression)
+        : expression(expression) {}
+
+    R accept(Visitor<R>* visitor) override {
         return visitor->visit(this);
     }
 
@@ -56,21 +59,27 @@ struct Grouping : Expr<R> {
 
 template<typename R>
 struct Unary : Expr<R> {
-    std::shared_ptr<Expr<R>> accept(Visitor<R>* visitor) override {
+    Unary(const Token& operator_, std::shared_ptr<Expr<R>> right)
+        : operator_(operator_), right(right) {}
+
+    R accept(Visitor<R>* visitor) override {
         return visitor->visit(this);
     }
 
-    Token operat;
-    std::shared_ptr<Expr<R>> expression;
+    Token operator_;
+    std::shared_ptr<Expr<R>> right;
 };
 
 template<typename R>
 struct Binary : Expr<R> {
-    std::shared_ptr<Expr<R>> accept(Visitor<R>* visitor) override {
+    Binary(std::shared_ptr<Expr<R>> left, const Token& operator_, std::shared_ptr<Expr<R>> right)
+        : left(left), operator_(operator_), right(right) {}
+
+    R accept(Visitor<R>* visitor) override {
         return visitor->visit(this);
     }
 
     std::shared_ptr<Expr<R>> left;
-    Token operat;
+    Token operator_;
     std::shared_ptr<Expr<R>> right;
 };
