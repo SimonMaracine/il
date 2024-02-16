@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 
 add_executable(il
+    "src/ast_printer.cpp"
     "src/ast_printer.hpp"
     "src/ast.hpp"
     "src/context.cpp"
     "src/context.hpp"
+    "src/il_main.cpp"
+    "src/il_main.hpp"
     "src/interpreter.cpp"
     "src/interpreter.hpp"
+    "src/literal.hpp"
     "src/main.cpp"
     "src/parser.cpp"
     "src/parser.hpp"

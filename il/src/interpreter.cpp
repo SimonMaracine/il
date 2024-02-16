@@ -1,85 +1,70 @@
 #include "interpreter.hpp"
 
-#include <iostream>
-#include <fstream>
+#include "token.hpp"
 
-#include "scanner.hpp"
-#include "parser.hpp"
-#include "ast_printer.hpp"  // TODO temporary
-
-void IlInterpreter::run_file(const std::string& file_path) {
-    const auto contents {read_file(file_path)};
-
-    if (!contents) {
-        return;  // FIXME error
-    }
-
-    run(*contents);
-
-    if (ctx.had_error) {
-        // FIXME error
-    }
+literal::Object Interpreter::visit(ast::Literal<literal::Object>* expr) {
+    return expr->value;
 }
 
-void IlInterpreter::run_repl() {
-    while (true) {
-        std::cout << "il> ";
+literal::Object Interpreter::visit(ast::Grouping<literal::Object>* expr) {
+    return evaluate(expr->expression);
+}
 
-        std::string line;
-        std::getline(std::cin, line);
+literal::Object Interpreter::visit(ast::Unary<literal::Object>* expr) {
+    const literal::Object right {evaluate(expr->right)};
 
-        if (std::cin.eof()) {
-            std::cout << std::endl;
+    switch (expr->operator_.get_type()) {
+        case TokenType::Minus:
+            return -std::get<2u>(right);
+        case TokenType::Bang:
+            return !std::get<3u>(right);
+        default:
             break;
-        }
-
-        if (std::cin.bad()) {
-            std::cin.clear();
-            continue;
-        }
-
-        if (line.empty()) {
-            continue;
-        }
-
-        run(line);
-
-        ctx.had_error = false;
     }
+
+    return {};
 }
 
-void IlInterpreter::run(const std::string& source_code) {
-    Scanner scanner {source_code, ctx};
-    const auto tokens {scanner.scan()};
+literal::Object Interpreter::visit(ast::Binary<literal::Object>* expr) {
+    const literal::Object left {evaluate(expr->left)};
+    const literal::Object right {evaluate(expr->right)};
 
-    Parser parser {tokens, ctx};
-    const auto expr {parser.parse<std::string>()};
+    switch (expr->operator_.get_type()) {
+        case TokenType::Minus:
+            return std::get<2u>(left) - std::get<2u>(right);
+        case TokenType::Plus:
+            if (left.index() == 2u && right.index() == 2u) {
+                return std::get<2u>(left) + std::get<2u>(right);
+            }
 
-    if (ctx.had_error) {
-        return;
+            if (left.index() == 1u && right.index() == 1u) {
+                return std::get<1u>(left) + std::get<1u>(right);
+            }
+
+            break;
+        case TokenType::Slash:
+            return std::get<2u>(left) / std::get<2u>(right);
+        case TokenType::Star:
+            return std::get<2u>(left) * std::get<2u>(right);
+        case TokenType::Greater:
+            return std::get<2u>(left) > std::get<2u>(right);
+        case TokenType::GreaterEqual:
+            return std::get<2u>(left) >= std::get<2u>(right);
+        case TokenType::Less:
+            return std::get<2u>(left) < std::get<2u>(right);
+        case TokenType::LessEqual:
+            return std::get<2u>(left) <= std::get<2u>(right);
+        case TokenType::BangEqual:
+            return std::get<3u>(left) != std::get<3u>(right);
+        case TokenType::EqualEqual:
+            return std::get<3u>(left) == std::get<3u>(right);
+        default:
+            break;
     }
 
-    // FIXME
-    std::cout << AstPrinter().print(expr) << '\n';
+    return {};
 }
 
-std::optional<std::string> IlInterpreter::read_file(const std::string& file_path) {
-    std::ifstream stream {file_path, std::ios_base::binary};
-
-    if (!stream.is_open()) {
-        return std::nullopt;
-    }
-
-    stream.seekg(0, stream.end);
-    const auto size {stream.tellg()};
-    stream.seekg(0, stream.beg);
-
-    char* buffer {new char[size]};
-    stream.read(buffer, size);
-
-    const std::string contents {buffer, static_cast<std::size_t>(size)};
-
-    delete[] buffer;
-
-    return contents;
+literal::Object Interpreter::evaluate(std::shared_ptr<ast::Expr<literal::Object>> expr) {
+    return expr->accept(this);
 }

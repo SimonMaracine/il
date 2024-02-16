@@ -1,17 +1,16 @@
 #pragma once
 
-#include <string>
-#include <optional>
+#include "ast.hpp"
+#include "literal.hpp"
 
-#include "context.hpp"
-
-class IlInterpreter {
+class Interpreter : ast::Visitor<literal::Object> {
 public:
-    void run_file(const std::string& file_path);  // TODO maybe return code
-    void run_repl();
-private:
-    void run(const std::string& source_code);
-    std::optional<std::string> read_file(const std::string& file_path);
 
-    Context ctx;
+private:
+    literal::Object visit(ast::Literal<literal::Object>* expr) override;
+    literal::Object visit(ast::Grouping<literal::Object>* expr) override;
+    literal::Object visit(ast::Unary<literal::Object>* expr) override;
+    literal::Object visit(ast::Binary<literal::Object>* expr) override;
+
+    literal::Object evaluate(std::shared_ptr<ast::Expr<literal::Object>> expr);
 };

@@ -6,7 +6,7 @@
 
 #include "token.hpp"
 
-class IlInterpreter;
+class IlMain;
 
 class Context {
 public:
@@ -17,5 +17,5 @@ private:
 
     bool had_error {false};
 
-    friend class IlInterpreter;
+    friend class IlMain;
 };

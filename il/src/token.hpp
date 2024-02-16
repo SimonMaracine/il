@@ -3,9 +3,10 @@
 #include <string>
 #include <cstddef>
 #include <ostream>
-#include <variant>
 #include <utility>
 #include <cassert>
+
+#include "literal.hpp"
 
 enum class TokenType {
     // Miscellaneous
@@ -32,11 +33,6 @@ enum class TokenType {
     // Other
     Bang, Equal
 };
-
-namespace literal {
-    struct Null {};
-    using Literal = std::variant<Null, std::string, double, bool>;
-}
 
 class Token {
 public:
