@@ -5,8 +5,7 @@
 #include <cstddef>
 
 #include "token.hpp"
-
-struct Context;
+#include "context.hpp"
 
 class Scanner {
 public:

@@ -8,25 +8,118 @@
 
 #include "token.hpp"
 #include "ast.hpp"
-
-struct Context;
+#include "context.hpp"
 
 class Parser {
 public:
     Parser(const std::vector<Token>& tokens, Context& ctx)
         : tokens(tokens), ctx(ctx) {}
 
-    std::shared_ptr<Expr<int>> parse();
+    template<typename R>
+    std::shared_ptr<Expr<R>> parse() {
+        try {
+            return expression<R>();
+        } catch (ParseError) {
+            return nullptr;
+        }
+    }
 private:
     using ParseError = int;
 
-    std::shared_ptr<Expr<int>> expression();
-    std::shared_ptr<Expr<int>> equality();
-    std::shared_ptr<Expr<int>> comparison();
-    std::shared_ptr<Expr<int>> term();
-    std::shared_ptr<Expr<int>> factor();
-    std::shared_ptr<Expr<int>> unary();
-    std::shared_ptr<Expr<int>> primary();
+    template<typename R>
+    std::shared_ptr<Expr<R>> expression() {
+        return equality<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> equality() {
+        std::shared_ptr<Expr<R>> expr {comparison<R>()};
+
+        while (match({TokenType::BangEqual, TokenType::EqualEqual})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<Expr<R>> right {comparison<R>()};
+            expr = std::make_shared<Binary<R>>(expr, operator_, right);
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> comparison() {
+        std::shared_ptr<Expr<R>> expr {term<R>()};
+
+        while (match({TokenType::Greater, TokenType::GreaterEqual, TokenType::Less, TokenType::LessEqual})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<Expr<R>> right {term<R>()};
+            expr = std::make_shared<Binary<R>>(expr, operator_, right);
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> term() {
+        std::shared_ptr<Expr<R>> expr {factor<R>()};
+
+        while (match({TokenType::Minus, TokenType::Plus})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<Expr<R>> right {factor<R>()};
+            expr = std::make_shared<Binary<R>>(expr, operator_, right);
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> factor() {
+        std::shared_ptr<Expr<R>> expr {unary<R>()};
+
+        while (match({TokenType::Slash, TokenType::Star})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<Expr<R>> right {unary<R>()};
+            expr = std::make_shared<Binary<R>>(expr, operator_, right);
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> unary() {
+        if (match({TokenType::Minus, TokenType::Bang})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<Expr<R>> right {unary<R>()};
+            return std::make_shared<Unary<R>>(operator_, right);
+        }
+
+        return primary<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<Expr<R>> primary() {
+        if (match({TokenType::Number, TokenType::String})) {
+            return std::make_shared<Literal<R>>(previous().get_literal());
+        }
+
+        if (match({TokenType::True})) {
+            return std::make_shared<Literal<R>>(true);
+        }
+
+        if (match({TokenType::False})) {
+            return std::make_shared<Literal<R>>(false);
+        }
+
+        if (match({TokenType::Null})) {
+            return std::make_shared<Literal<R>>(literal::Null());
+        }
+
+        if (match({TokenType::LeftParen})) {
+            std::shared_ptr<Expr<R>> expr {expression<R>()};
+            consume(TokenType::RightParen, "Expected `)` after expression");
+            return std::make_shared<Grouping<R>>(expr);
+        }
+
+        throw error(peek(), "Expected an expression");
+    }
 
     bool match(std::initializer_list<TokenType> types);
     bool check(TokenType type);

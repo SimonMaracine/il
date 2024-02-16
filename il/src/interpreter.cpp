@@ -53,14 +53,14 @@ void IlInterpreter::run(const std::string& source_code) {
     const auto tokens {scanner.scan()};
 
     Parser parser {tokens, ctx};
-    const auto expr {parser.parse()};
+    const auto expr {parser.parse<std::string>()};
 
     if (ctx.had_error) {
         return;
     }
 
     // FIXME
-    // std::cout << AstPrinter().print(expr) << '\n';
+    std::cout << AstPrinter().print(expr) << '\n';
 }
 
 std::optional<std::string> IlInterpreter::read_file(const std::string& file_path) {

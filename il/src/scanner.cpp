@@ -5,8 +5,6 @@
 #include <utility>
 #include <unordered_map>
 
-#include "context.hpp"
-
 std::vector<Token> Scanner::scan() {
     while (!reached_end()) {
         // Beginning of the next lexeme
