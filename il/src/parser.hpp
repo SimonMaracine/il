@@ -15,6 +15,8 @@ class Parser {
 public:
     Parser(const std::vector<Token>& tokens, Context& ctx)
         : tokens(tokens), ctx(ctx) {}
+
+    std::shared_ptr<Expr<int>> parse();
 private:
     using ParseError = int;
 
@@ -34,6 +36,7 @@ private:
     const Token& previous();
     const Token& consume(TokenType type, const std::string& message);
     ParseError error(const Token& token, const std::string& message);
+    void synchronize();
 
     std::vector<Token> tokens;
     std::size_t current {};

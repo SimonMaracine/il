@@ -2,6 +2,14 @@
 
 #include "context.hpp"
 
+std::shared_ptr<Expr<int>> Parser::parse() {
+    try {
+        return expression();
+    } catch (ParseError) {
+        return nullptr;
+    }
+}
+
 std::shared_ptr<Expr<int>> Parser::expression() {
     return equality();
 }
@@ -66,19 +74,19 @@ std::shared_ptr<Expr<int>> Parser::unary() {
 
 std::shared_ptr<Expr<int>> Parser::primary() {
     if (match({TokenType::Number, TokenType::String})) {
-        return std::make_shared<Literal<int>>();
+        return std::make_shared<Literal<int>>(previous().get_literal());
     }
 
     if (match({TokenType::True})) {
-        return std::make_shared<Literal<int>>();
+        return std::make_shared<Literal<int>>(true);
     }
 
     if (match({TokenType::False})) {
-        return std::make_shared<Literal<int>>();
+        return std::make_shared<Literal<int>>(false);
     }
 
     if (match({TokenType::Null})) {
-        return std::make_shared<Literal<int>>();
+        return std::make_shared<Literal<int>>(literal::Null());
     }
 
     if (match({TokenType::LeftParen})) {
@@ -87,7 +95,7 @@ std::shared_ptr<Expr<int>> Parser::primary() {
         return std::make_shared<Grouping<int>>(expr);
     }
 
-    // FIXME maybe panic here
+    throw error(peek(), "Expected an expression");
 }
 
 bool Parser::match(std::initializer_list<TokenType> types) {
@@ -140,4 +148,24 @@ const Token& Parser::consume(TokenType type, const std::string& message) {
 Parser::ParseError Parser::error(const Token& token, const std::string& message) {
     ctx.error(token, message);
     return ParseError();
+}
+
+// TODO will be used later
+void Parser::synchronize() {
+    advance();
+
+    while (!reached_end()) {
+        if (previous().get_type() == TokenType::Semicolon) {
+            return;
+        }
+
+        switch (peek().get_type()) {
+            case TokenType::Let:  // TODO other
+                return;
+            default:
+                break;
+        }
+
+        advance();
+    }
 }

@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include "scanner.hpp"
+#include "parser.hpp"
+#include "ast_printer.hpp"  // TODO temporary
 
 void IlInterpreter::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
@@ -50,9 +52,15 @@ void IlInterpreter::run(const std::string& source_code) {
     Scanner scanner {source_code, ctx};
     const auto tokens {scanner.scan()};
 
-    for (Token token : tokens) {
-        std::cout << token << '\n';
+    Parser parser {tokens, ctx};
+    const auto expr {parser.parse()};
+
+    if (ctx.had_error) {
+        return;
     }
+
+    // FIXME
+    // std::cout << AstPrinter().print(expr) << '\n';
 }
 
 std::optional<std::string> IlInterpreter::read_file(const std::string& file_path) {

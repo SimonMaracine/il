@@ -38,11 +38,14 @@ struct Expr {
 
 template<typename R>
 struct Literal : Expr<R> {
+    Literal(const literal::Literal& value)
+        : value(value) {}
+
     R accept(Visitor<R>* visitor) override {
         return visitor->visit(this);
     }
 
-    // TODO value
+    literal::Literal value;
 };
 
 template<typename R>

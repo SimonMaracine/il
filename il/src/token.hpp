@@ -33,6 +33,11 @@ enum class TokenType {
     Bang, Equal
 };
 
+namespace literal {
+    struct Null {};
+    using Literal = std::variant<Null, std::string, double, bool>;
+}
+
 class Token {
 public:
     // Token() = default;  // FIXME ?
@@ -53,13 +58,12 @@ public:
     TokenType get_type() const { return type; };
     std::size_t get_line() const { return line; };
     const std::string& get_lexeme() const { return lexeme; }
+    const literal::Literal& get_literal() const { return literal; }
 private:
-    struct None {};
-
     TokenType type {};
     std::size_t line {};
     std::string lexeme;
-    std::variant<None, std::string, double> literal;
+    literal::Literal literal;
 
     friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 };

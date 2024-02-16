@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <sstream>
+#include <cassert>
 
 #include "ast.hpp"
 
@@ -13,9 +14,21 @@ public:
     }
 
     std::string visit(Literal<std::string>* expr) override {
-        // TODO
+        switch (expr->value.index()) {
+            case 0u:
+                return "Null";
+            case 1u:
+                return std::get<1u>(expr->value);
+            case 2u:
+                return std::to_string(std::get<2u>(expr->value));
+            case 3u:
+                return std::to_string(std::get<3u>(expr->value));
+            default:
+                assert(false);
+                break;
+        }
 
-        return "";
+        return {};
     }
 
     std::string visit(Grouping<std::string>* expr) override {
@@ -23,11 +36,11 @@ public:
     }
 
     std::string visit(Unary<std::string>* expr) override {
-        return parenthesize(expr->operat.get_lexeme(), expr->expression);
+        return parenthesize(expr->operator_.get_lexeme(), expr->right);
     }
 
     std::string visit(Binary<std::string>* expr) override {
-        return parenthesize(expr->operat.get_lexeme(), expr->left, expr->right);
+        return parenthesize(expr->operator_.get_lexeme(), expr->left, expr->right);
     }
 private:
     std::string parenthesize(const std::string& name, std::shared_ptr<Expr<std::string>> expr) {
