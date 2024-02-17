@@ -9,7 +9,7 @@
 
 class Scanner {
 public:
-    Scanner(const std::string& source_code, Context& ctx)
+    Scanner(const std::string& source_code, Context* ctx)
         : source_code(source_code), ctx(ctx) {}
 
     std::vector<Token> scan();
@@ -38,5 +38,5 @@ private:
     std::size_t current {};  // Current in source string
     std::size_t line {1u};  // Line of the current character
 
-    Context& ctx;
+    Context* ctx {nullptr};
 };

@@ -12,7 +12,7 @@
 
 class Parser {
 public:
-    Parser(const std::vector<Token>& tokens, Context& ctx)
+    Parser(const std::vector<Token>& tokens, Context* ctx)
         : tokens(tokens), ctx(ctx) {}
 
     template<typename R>
@@ -134,5 +134,5 @@ private:
     std::vector<Token> tokens;
     std::size_t current {};
 
-    Context& ctx;
+    Context* ctx {nullptr};
 };

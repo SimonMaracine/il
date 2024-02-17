@@ -101,7 +101,7 @@ void Scanner::scan_token() {
             if (is_alpha(character)) {
                 identifier();
             } else {
-                ctx.error(line, std::string("Unexpected character: `") + character + "`");
+                ctx->error(line, std::string("Unexpected character: `") + character + "`");
             }
     }
 }
@@ -189,7 +189,7 @@ void Scanner::string() {
     }
 
     if (reached_end()) {
-        ctx.error(line, "Unterminated string");
+        ctx->error(line, "Unterminated string");
         return;
     }
 
@@ -248,7 +248,7 @@ double Scanner::parse_double(const std::string& string) {
     } catch (const std::invalid_argument&) {
         assert(false);
     } catch (const std::out_of_range&) {
-        ctx.error(line, "Number out of range");
+        ctx->error(line, "Number out of range");
         return 0.0;
     }
 

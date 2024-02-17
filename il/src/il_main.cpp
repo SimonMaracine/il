@@ -5,19 +5,27 @@
 
 #include "scanner.hpp"
 #include "parser.hpp"
+#include "literal.hpp"
 #include "ast_printer.hpp"  // TODO temporary
 
 void IlMain::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
 
     if (!contents) {
-        return;  // FIXME error
+        // FIXME error
+        return;
     }
 
     run(*contents);
 
     if (ctx.had_error) {
         // FIXME error
+        return;
+    }
+
+    if (ctx.had_runtime_error) {
+        // FIXME error
+        return;
     }
 }
 
@@ -49,18 +57,28 @@ void IlMain::run_repl() {
 }
 
 void IlMain::run(const std::string& source_code) {
-    Scanner scanner {source_code, ctx};
+    Scanner scanner {source_code, &ctx};
     const auto tokens {scanner.scan()};
 
-    Parser parser {tokens, ctx};
+    Parser parser {tokens, &ctx};
+
+#if 0
     const auto expr {parser.parse<std::string>()};
 
     if (ctx.had_error) {
         return;
     }
 
-    // FIXME
     std::cout << AstPrinter().print(expr) << '\n';
+#endif
+
+    const auto expr {parser.parse<literal::Object>()};
+
+    if (ctx.had_error) {
+        return;
+    }
+
+    interpreter.interpret(expr);
 }
 
 std::optional<std::string> IlMain::read_file(const std::string& file_path) {

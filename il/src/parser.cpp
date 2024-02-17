@@ -48,7 +48,7 @@ const Token& Parser::consume(TokenType type, const std::string& message) {
 }
 
 Parser::ParseError Parser::error(const Token& token, const std::string& message) {
-    ctx.error(token, message);
+    ctx->error(token, message);
     return ParseError();
 }
 
