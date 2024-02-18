@@ -1,5 +1,6 @@
 #include "interpreter.hpp"
 
+#include <cassert>
 #include <iostream>  // FIXME delete
 
 void Interpreter::interpret(std::shared_ptr<ast::Expr<literal::Object>> expr) {
@@ -43,11 +44,13 @@ literal::Object Interpreter::visit(ast::Unary<literal::Object>* expr) {
             check_number_operand(expr->operator_, right);
             return -std::get<2u>(right);
         case TokenType::Bang:
+            check_boolean_operand(expr->operator_, right);
             return !std::get<3u>(right);
         default:
             break;
     }
 
+    assert(false);
     return {};
 }
 
@@ -97,6 +100,7 @@ literal::Object Interpreter::visit(ast::Binary<literal::Object>* expr) {
             break;
     }
 
+    assert(false);
     return {};
 }
 
@@ -118,4 +122,12 @@ void Interpreter::check_number_operands(const Token& token, const literal::Objec
     }
 
     throw RuntimeError(token, "Operands must be numbers");
+}
+
+void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) {
+    if (right.index() == 3u) {
+        return;
+    }
+
+    throw RuntimeError(token, "Operand must be a boolean expression");
 }

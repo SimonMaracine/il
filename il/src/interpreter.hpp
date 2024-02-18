@@ -31,6 +31,7 @@ private:
 
     void check_number_operand(const Token& token, const literal::Object& right);
     void check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right);
+    void check_boolean_operand(const Token& token, const literal::Object& right);
 
     Context* ctx {nullptr};
 };
