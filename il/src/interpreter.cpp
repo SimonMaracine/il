@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>  // FIXME delete
 
-void Interpreter::interpret(std::shared_ptr<ast::Expr<literal::Object>> expr) {
+void Interpreter::interpret(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
     try {
         const literal::Object value {evaluate(expr)};
 
@@ -28,15 +28,15 @@ void Interpreter::interpret(std::shared_ptr<ast::Expr<literal::Object>> expr) {
     }
 }
 
-literal::Object Interpreter::visit(ast::Literal<literal::Object>* expr) {
+literal::Object Interpreter::visit(ast::expr::Literal<literal::Object>* expr) {
     return expr->value;
 }
 
-literal::Object Interpreter::visit(ast::Grouping<literal::Object>* expr) {
+literal::Object Interpreter::visit(ast::expr::Grouping<literal::Object>* expr) {
     return evaluate(expr->expression);
 }
 
-literal::Object Interpreter::visit(ast::Unary<literal::Object>* expr) {
+literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
     const literal::Object right {evaluate(expr->right)};
 
     switch (expr->operator_.get_type()) {
@@ -54,7 +54,7 @@ literal::Object Interpreter::visit(ast::Unary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::visit(ast::Binary<literal::Object>* expr) {
+literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
     const literal::Object left {evaluate(expr->left)};
     const literal::Object right {evaluate(expr->right)};
 
@@ -104,7 +104,7 @@ literal::Object Interpreter::visit(ast::Binary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::evaluate(std::shared_ptr<ast::Expr<literal::Object>> expr) {
+literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
     return expr->accept(this);
 }
 

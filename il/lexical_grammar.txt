@@ -1,13 +1,22 @@
-expression : equality ;
+program         : statement* EOF ;
 
-equality   : comparison ( ( "!=" | "==" ) comparison )* ;
+statement       : expr_statement | print_statement ;
 
-comparison : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+expr_statement  : expression ";" ;
 
-term       : factor ( ( "-" | "+" ) factor )* ;
+print_statement : "print" expression ";" ;
 
-factor     : unary ( ( "/" | "*" ) unary )* ;
 
-unary      : ( "-" | "!" ) unary | primary ;
+expression      : equality ;
 
-primary    : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
+equality        : comparison ( ( "!=" | "==" ) comparison )* ;
+
+comparison      : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term            : factor ( ( "-" | "+" ) factor )* ;
+
+factor          : unary ( ( "/" | "*" ) unary )* ;
+
+unary           : ( "-" | "!" ) unary | primary ;
+
+primary         : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;

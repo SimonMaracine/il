@@ -3,11 +3,11 @@
 #include <sstream>
 #include <cassert>
 
-std::string AstPrinter::print(std::shared_ptr<ast::Expr<std::string>> expr) {
+std::string AstPrinter::print(std::shared_ptr<ast::expr::Expr<std::string>> expr) {
     return expr->accept(this);
 }
 
-std::string AstPrinter::visit(ast::Literal<std::string>* expr) {
+std::string AstPrinter::visit(ast::expr::Literal<std::string>* expr) {
     switch (expr->value.index()) {
         case 0u:
             return "null";
@@ -25,19 +25,19 @@ std::string AstPrinter::visit(ast::Literal<std::string>* expr) {
     return {};
 }
 
-std::string AstPrinter::visit(ast::Grouping<std::string>* expr) {
+std::string AstPrinter::visit(ast::expr::Grouping<std::string>* expr) {
     return parenthesize("group", {expr->expression});
 }
 
-std::string AstPrinter::visit(ast::Unary<std::string>* expr) {
+std::string AstPrinter::visit(ast::expr::Unary<std::string>* expr) {
     return parenthesize(expr->operator_.get_lexeme(), {expr->right});
 }
 
-std::string AstPrinter::visit(ast::Binary<std::string>* expr) {
+std::string AstPrinter::visit(ast::expr::Binary<std::string>* expr) {
     return parenthesize(expr->operator_.get_lexeme(), {expr->left, expr->right});
 }
 
-std::string AstPrinter::parenthesize(const std::string& name, std::initializer_list<std::shared_ptr<ast::Expr<std::string>>> list) {
+std::string AstPrinter::parenthesize(const std::string& name, std::initializer_list<std::shared_ptr<ast::expr::Expr<std::string>>> list) {
     std::ostringstream stream;
 
     stream << '(' << name;
