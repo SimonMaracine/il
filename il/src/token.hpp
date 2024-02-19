@@ -31,7 +31,7 @@ enum class TokenType {
     Let, True, False, Null, Or, And,
 
     // Other
-    Bang, Equal
+    Bang, Equal, Print
 };
 
 class Token {
@@ -155,6 +155,9 @@ inline std::ostream& operator<<(std::ostream& stream, const TokenType token_type
             break;
         case TokenType::And:
             stream << "And";
+            break;
+        case TokenType::Print:
+            stream << "Print";
             break;
     }
 

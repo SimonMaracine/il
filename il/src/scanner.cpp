@@ -227,7 +227,8 @@ void Scanner::identifier() {
         { "false", TokenType::False },
         { "null", TokenType::Null },
         { "or", TokenType::Or },
-        { "and", TokenType::And }
+        { "and", TokenType::And },
+        { "print", TokenType::Print }
     };
 
     const auto word {source_code.substr(start, current - start)};

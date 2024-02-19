@@ -72,13 +72,13 @@ void IlMain::run(const std::string& source_code) {
     std::cout << AstPrinter().print(expr) << '\n';
 #endif
 
-    const auto expr {parser.parse<literal::Object>()};
+    const auto statements {parser.parse<literal::Object>()};
 
     if (ctx.had_error) {
         return;
     }
 
-    interpreter.interpret(expr);
+    interpreter.interpret(statements);
 }
 
 std::optional<std::string> IlMain::read_file(const std::string& file_path) {

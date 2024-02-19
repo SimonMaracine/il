@@ -16,15 +16,44 @@ public:
         : tokens(tokens), ctx(ctx) {}
 
     template<typename R>
-    std::shared_ptr<ast::expr::Expr<R>> parse() {
-        try {
-            return expression<R>();
-        } catch (ParseError) {
-            return nullptr;
+    std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> parse() {
+        std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> statements;
+
+        while (!reached_end()) {
+            statements.push_back(statement<R>());
         }
+
+        return statements;
     }
 private:
     using ParseError = int;
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> statement() {
+        if (match({TokenType::Print})) {
+            return print_statement<R>();
+        }
+
+        return expr_statement<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> expr_statement() {
+        std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
+
+        consume(TokenType::Semicolon, "Expected `;` after expression");
+
+        return std::make_shared<ast::stmt::Expression<R>>(expr);
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> print_statement() {
+        std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
+
+        consume(TokenType::Semicolon, "Expected `;` after expression");
+
+        return std::make_shared<ast::stmt::Print<R>>(expr);
+    }
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> expression() {
@@ -88,6 +117,7 @@ private:
         if (match({TokenType::Minus, TokenType::Bang})) {
             const Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {unary<R>()};
+
             return std::make_shared<ast::expr::Unary<R>>(operator_, right);
         }
 
@@ -115,6 +145,7 @@ private:
         if (match({TokenType::LeftParen})) {
             std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
             consume(TokenType::RightParen, "Expected `)` after expression");
+
             return std::make_shared<ast::expr::Grouping<R>>(expr);
         }
 

@@ -1,42 +1,27 @@
 #include "interpreter.hpp"
 
 #include <cassert>
-#include <iostream>  // FIXME delete
+#include <iostream>
 
-void Interpreter::interpret(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
+void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements) {
     try {
-        const literal::Object value {evaluate(expr)};
-
-        switch (value.index()) {
-            case 0u:
-                std::cout << "null" << '\n';
-                break;
-            case 1u:
-                std::cout << std::get<1u>(value) << '\n';
-                break;
-            case 2u:
-                std::cout << std::get<2u>(value) << '\n';
-                break;
-            case 3u:
-                std::cout << (std::get<3u>(value) ? "true" : "false") << '\n';
-                break;
-            default:
-                break;
+        for (const std::shared_ptr<ast::stmt::Stmt<literal::Object>>& statement : statements) {
+            execute(statement);
         }
     } catch (const RuntimeError& e) {
         ctx->runtime_error(e.token, e.message);
     }
 }
 
-literal::Object Interpreter::visit(ast::expr::Literal<literal::Object>* expr) {
+literal::Object Interpreter::visit(const ast::expr::Literal<literal::Object>* expr) const {
     return expr->value;
 }
 
-literal::Object Interpreter::visit(ast::expr::Grouping<literal::Object>* expr) {
+literal::Object Interpreter::visit(const ast::expr::Grouping<literal::Object>* expr) const {
     return evaluate(expr->expression);
 }
 
-literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
+literal::Object Interpreter::visit(const ast::expr::Unary<literal::Object>* expr) const {
     const literal::Object right {evaluate(expr->right)};
 
     switch (expr->operator_.get_type()) {
@@ -54,7 +39,7 @@ literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
+literal::Object Interpreter::visit(const ast::expr::Binary<literal::Object>* expr) const {
     const literal::Object left {evaluate(expr->left)};
     const literal::Object right {evaluate(expr->right)};
 
@@ -104,11 +89,44 @@ literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
+literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) const {
     return expr->accept(this);
 }
 
-void Interpreter::check_number_operand(const Token& token, const literal::Object& right) {
+literal::Object Interpreter::visit(const ast::stmt::Expression<literal::Object>* stmt) const {
+    evaluate(stmt->expression);
+    return {};
+}
+
+literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt) const {
+    const literal::Object value {evaluate(stmt->expression)};
+
+    switch (value.index()) {
+        case 0u:
+            std::cout << "null" << '\n';
+            break;
+        case 1u:
+            std::cout << std::get<1u>(value) << '\n';
+            break;
+        case 2u:
+            std::cout << std::get<2u>(value) << '\n';
+            break;
+        case 3u:
+            std::cout << (std::get<3u>(value) ? "true" : "false") << '\n';
+            break;
+        default:
+            assert(false);
+            break;
+    }
+
+    return {};
+}
+
+void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<literal::Object>> statement) {
+    statement->accept(this);
+}
+
+void Interpreter::check_number_operand(const Token& token, const literal::Object& right) const {
     if (right.index() == 2u) {
         return;
     }
@@ -116,7 +134,7 @@ void Interpreter::check_number_operand(const Token& token, const literal::Object
     throw RuntimeError(token, "Operand must be a number");
 }
 
-void Interpreter::check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right) {
+void Interpreter::check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right) const {
     if (left.index() == 2u && right.index() == 2u) {
         return;
     }
@@ -124,7 +142,7 @@ void Interpreter::check_number_operands(const Token& token, const literal::Objec
     throw RuntimeError(token, "Operands must be numbers");
 }
 
-void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) {
+void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) const {
     if (right.index() == 3u) {
         return;
     }
