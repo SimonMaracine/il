@@ -52,7 +52,6 @@ Parser::ParseError Parser::error(const Token& token, const std::string& message)
     return ParseError();
 }
 
-// TODO will be used later
 void Parser::synchronize() {
     advance();
 

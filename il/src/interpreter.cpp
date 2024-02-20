@@ -3,6 +3,8 @@
 #include <cassert>
 #include <iostream>
 
+#include "runtime_error.hpp"
+
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements) {
     try {
         for (const std::shared_ptr<ast::stmt::Stmt<literal::Object>>& statement : statements) {
@@ -89,16 +91,21 @@ literal::Object Interpreter::visit(const ast::expr::Binary<literal::Object>* exp
     return {};
 }
 
+literal::Object Interpreter::visit(const ast::expr::Variable<literal::Object>* expr) const {
+    return environment.get(expr->name);
+}
+
 literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) const {
     return expr->accept(this);
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Expression<literal::Object>* stmt) const {
+literal::Object Interpreter::visit(const ast::stmt::Expression<literal::Object>* stmt) {
     evaluate(stmt->expression);
+
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt) const {
+literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt) {
     const literal::Object value {evaluate(stmt->expression)};
 
     switch (value.index()) {
@@ -118,6 +125,18 @@ literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt
             assert(false);
             break;
     }
+
+    return {};
+}
+
+literal::Object Interpreter::visit(const ast::stmt::Let<literal::Object>* stmt) {
+    literal::Object value;
+
+    if (stmt->initializer != nullptr) {
+        value = evaluate(stmt->initializer);
+    }
+
+    environment.define(stmt->name.get_lexeme(), value);
 
     return {};
 }

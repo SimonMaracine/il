@@ -1,6 +1,10 @@
 program         : statement* EOF ;
 
+declaration     : var_declaration | statement ;
+
 statement       : expr_statement | print_statement ;
+
+var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
 
 expr_statement  : expression ";" ;
 
@@ -19,4 +23,4 @@ factor          : unary ( ( "/" | "*" ) unary )* ;
 
 unary           : ( "-" | "!" ) unary | primary ;
 
-primary         : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
+primary         : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" | IDENTIFIER ;

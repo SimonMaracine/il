@@ -20,7 +20,7 @@ public:
         std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> statements;
 
         while (!reached_end()) {
-            statements.push_back(statement<R>());
+            statements.push_back(declaration<R>());
         }
 
         return statements;
@@ -29,12 +29,42 @@ private:
     using ParseError = int;
 
     template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> declaration() {
+        try {
+            if (match({TokenType::Let})) {
+                return var_statement<R>();
+            }
+
+            return statement<R>();
+        } catch (ParseError) {
+            synchronize();
+
+            return nullptr;
+        }
+    }
+
+    template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> statement() {
         if (match({TokenType::Print})) {
             return print_statement<R>();
         }
 
         return expr_statement<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> var_statement() {
+        const Token& name {consume(TokenType::Identifier, "Expected a variable name")};
+
+        std::shared_ptr<ast::expr::Expr<R>> initializer;
+
+        if (match({TokenType::Equal})) {
+            initializer = expression<R>();
+        }
+
+        consume(TokenType::Semicolon, "Expected `;` after variable declaration");
+
+        return std::make_shared<ast::stmt::Let<R>>(name, initializer);
     }
 
     template<typename R>
@@ -140,6 +170,10 @@ private:
 
         if (match({TokenType::Null})) {
             return std::make_shared<ast::expr::Literal<R>>(literal::Null());
+        }
+
+        if (match({TokenType::Identifier})) {
+            return std::make_shared<ast::expr::Variable<R>>(previous());
         }
 
         if (match({TokenType::LeftParen})) {

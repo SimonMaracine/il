@@ -23,11 +23,15 @@ namespace ast {
         struct Binary;
 
         template<typename R>
+        struct Variable;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(const Literal<R>* expr) const = 0;
             virtual R visit(const Grouping<R>* expr) const = 0;
             virtual R visit(const Unary<R>* expr) const = 0;
             virtual R visit(const Binary<R>* expr) const = 0;
+            virtual R visit(const Variable<R>* expr) const = 0;
         };
 
         template<typename R>
@@ -87,6 +91,18 @@ namespace ast {
             Token operator_;
             std::shared_ptr<Expr<R>> right;
         };
+
+        template<typename R>
+        struct Variable : Expr<R> {
+            Variable(const Token& name)
+                : name(name) {}
+
+            R accept(const Visitor<R>* visitor) const override {
+                return visitor->visit(this);
+            }
+
+            Token name;
+        };
     }
 
     namespace stmt {
@@ -99,16 +115,20 @@ namespace ast {
         struct Print;
 
         template<typename R>
+        struct Let;
+
+        template<typename R>
         struct Visitor {
-            virtual R visit(const Expression<R>* stmt) const = 0;
-            virtual R visit(const Print<R>* stmt) const = 0;
+            virtual R visit(const Expression<R>* stmt) = 0;
+            virtual R visit(const Print<R>* stmt) = 0;
+            virtual R visit(const Let<R>* stmt) = 0;
         };
 
         template<typename R>
         struct Stmt {
             virtual ~Stmt() noexcept = default;
 
-            virtual R accept(const Visitor<R>* visitor) const = 0;
+            virtual R accept(Visitor<R>* visitor) = 0;
         };
 
         template<typename R>
@@ -116,7 +136,7 @@ namespace ast {
             Expression(std::shared_ptr<Expr<R>> expression)
                 : expression(expression) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
@@ -128,11 +148,24 @@ namespace ast {
             Print(std::shared_ptr<Expr<R>> expression)
                 : expression(expression) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
             std::shared_ptr<Expr<R>> expression;
+        };
+
+        template<typename R>
+        struct Let : Stmt<R> {
+            Let(const Token& name, std::shared_ptr<Expr<R>> initializer)
+                : name(name), initializer(initializer) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            Token name;
+            std::shared_ptr<Expr<R>> initializer;
         };
     }
 }

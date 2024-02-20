@@ -36,8 +36,6 @@ enum class TokenType {
 
 class Token {
 public:
-    // Token() = default;  // FIXME ?
-
     Token(TokenType type, const std::string& lexeme, std::size_t line)
         : type(type), line(line), lexeme(lexeme) {}
 
