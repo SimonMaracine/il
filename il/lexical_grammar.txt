@@ -11,7 +11,9 @@ expr_statement  : expression ";" ;
 print_statement : "print" expression ";" ;
 
 
-expression      : equality ;
+expression      : assignment ;
+
+assignment      : IDENTIFIER "=" assignment | equality ;
 
 equality        : comparison ( ( "!=" | "==" ) comparison )* ;
 

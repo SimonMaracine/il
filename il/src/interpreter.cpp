@@ -15,15 +15,15 @@ void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<li
     }
 }
 
-literal::Object Interpreter::visit(const ast::expr::Literal<literal::Object>* expr) const {
+literal::Object Interpreter::visit(ast::expr::Literal<literal::Object>* expr) {
     return expr->value;
 }
 
-literal::Object Interpreter::visit(const ast::expr::Grouping<literal::Object>* expr) const {
+literal::Object Interpreter::visit(ast::expr::Grouping<literal::Object>* expr) {
     return evaluate(expr->expression);
 }
 
-literal::Object Interpreter::visit(const ast::expr::Unary<literal::Object>* expr) const {
+literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
     const literal::Object right {evaluate(expr->right)};
 
     switch (expr->operator_.get_type()) {
@@ -41,7 +41,7 @@ literal::Object Interpreter::visit(const ast::expr::Unary<literal::Object>* expr
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::expr::Binary<literal::Object>* expr) const {
+literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
     const literal::Object left {evaluate(expr->left)};
     const literal::Object right {evaluate(expr->right)};
 
@@ -91,11 +91,19 @@ literal::Object Interpreter::visit(const ast::expr::Binary<literal::Object>* exp
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::expr::Variable<literal::Object>* expr) const {
+literal::Object Interpreter::visit(ast::expr::Variable<literal::Object>* expr) {
     return environment.get(expr->name);
 }
 
-literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) const {
+literal::Object Interpreter::visit(ast::expr::Assignment<literal::Object>* expr) {
+    const literal::Object value {evaluate(expr->value)};
+
+    environment.assign(expr->name, value);
+
+    return value;
+}
+
+literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
     return expr->accept(this);
 }
 

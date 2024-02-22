@@ -16,13 +16,14 @@ public:
 
     void interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements);
 private:
-    literal::Object visit(const ast::expr::Literal<literal::Object>* expr) const override;
-    literal::Object visit(const ast::expr::Grouping<literal::Object>* expr) const override;
-    literal::Object visit(const ast::expr::Unary<literal::Object>* expr) const override;
-    literal::Object visit(const ast::expr::Binary<literal::Object>* expr) const override;
-    literal::Object visit(const ast::expr::Variable<literal::Object>* expr) const override;
+    literal::Object visit(ast::expr::Literal<literal::Object>* expr) override;
+    literal::Object visit(ast::expr::Grouping<literal::Object>* expr) override;
+    literal::Object visit(ast::expr::Unary<literal::Object>* expr) override;
+    literal::Object visit(ast::expr::Binary<literal::Object>* expr) override;
+    literal::Object visit(ast::expr::Variable<literal::Object>* expr) override;
+    literal::Object visit(ast::expr::Assignment<literal::Object>* expr) override;
 
-    literal::Object evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) const;
+    literal::Object evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr);
 
     literal::Object visit(const ast::stmt::Expression<literal::Object>* stmt) override;
     literal::Object visit(const ast::stmt::Print<literal::Object>* stmt) override;

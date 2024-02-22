@@ -26,19 +26,23 @@ namespace ast {
         struct Variable;
 
         template<typename R>
+        struct Assignment;
+
+        template<typename R>
         struct Visitor {
-            virtual R visit(const Literal<R>* expr) const = 0;
-            virtual R visit(const Grouping<R>* expr) const = 0;
-            virtual R visit(const Unary<R>* expr) const = 0;
-            virtual R visit(const Binary<R>* expr) const = 0;
-            virtual R visit(const Variable<R>* expr) const = 0;
+            virtual R visit(Literal<R>* expr) = 0;
+            virtual R visit(Grouping<R>* expr) = 0;
+            virtual R visit(Unary<R>* expr) = 0;
+            virtual R visit(Binary<R>* expr) = 0;
+            virtual R visit(Variable<R>* expr) = 0;
+            virtual R visit(Assignment<R>* expr) = 0;
         };
 
         template<typename R>
         struct Expr {
             virtual ~Expr() noexcept = default;
 
-            virtual R accept(const Visitor<R>* visitor) const = 0;
+            virtual R accept(Visitor<R>* visitor) = 0;
         };
 
         template<typename R>
@@ -46,7 +50,7 @@ namespace ast {
             Literal(const literal::Object& value)
                 : value(value) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
@@ -58,7 +62,7 @@ namespace ast {
             Grouping(std::shared_ptr<Expr<R>> expression)
                 : expression(expression) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
@@ -70,7 +74,7 @@ namespace ast {
             Unary(const Token& operator_, std::shared_ptr<Expr<R>> right)
                 : operator_(operator_), right(right) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
@@ -83,7 +87,7 @@ namespace ast {
             Binary(std::shared_ptr<Expr<R>> left, const Token& operator_, std::shared_ptr<Expr<R>> right)
                 : left(left), operator_(operator_), right(right) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
@@ -97,11 +101,24 @@ namespace ast {
             Variable(const Token& name)
                 : name(name) {}
 
-            R accept(const Visitor<R>* visitor) const override {
+            R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
             Token name;
+        };
+
+        template<typename R>
+        struct Assignment : Expr<R> {
+            Assignment(const Token& name, std::shared_ptr<Expr<R>> value)
+                : name(name), value(value) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            Token name;
+            std::shared_ptr<Expr<R>> value;
         };
     }
 
