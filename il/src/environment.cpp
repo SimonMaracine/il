@@ -11,12 +11,21 @@ literal::Object Environment::get(const Token& name) const {
         return values.at(name.get_lexeme());
     }
 
+    if (enclosing != nullptr) {
+        return enclosing->get(name);
+    }
+
     throw RuntimeError(name, "Undefined variable `" + name.get_lexeme() + "`");
 }
 
 void Environment::assign(const Token& name, const literal::Object& value) {
     if (values.find(name.get_lexeme()) != values.cend()) {
         values.at(name.get_lexeme()) = value;
+        return;
+    }
+
+    if (enclosing != nullptr) {
+        enclosing->assign(name, value);
         return;
     }
 

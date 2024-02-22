@@ -49,6 +49,10 @@ private:
             return print_statement<R>();
         }
 
+        if (match({TokenType::LeftBrace})) {
+            return std::make_shared<ast::stmt::Block<R>>(block<R>());
+        }
+
         return expr_statement<R>();
     }
 
@@ -83,6 +87,19 @@ private:
         consume(TokenType::Semicolon, "Expected `;` after expression");
 
         return std::make_shared<ast::stmt::Print<R>>(expr);
+    }
+
+    template<typename R>
+    std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> block() {
+        std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> statements;
+
+        while (!check(TokenType::RightBrace) && !reached_end()) {
+            statements.push_back(declaration<R>());
+        }
+
+        consume(TokenType::RightBrace, "Excpected `}` after block");
+
+        return statements;
     }
 
     template<typename R>

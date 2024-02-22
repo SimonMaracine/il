@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "token.hpp"
 #include "literal.hpp"
@@ -135,10 +136,14 @@ namespace ast {
         struct Let;
 
         template<typename R>
+        struct Block;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(const Expression<R>* stmt) = 0;
             virtual R visit(const Print<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
+            virtual R visit(const Block<R>* stmt) = 0;
         };
 
         template<typename R>
@@ -183,6 +188,18 @@ namespace ast {
 
             Token name;
             std::shared_ptr<Expr<R>> initializer;
+        };
+
+        template<typename R>
+        struct Block : Stmt<R> {
+            Block(const std::vector<std::shared_ptr<Stmt<R>>>& statements)
+                : statements(statements) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::vector<std::shared_ptr<Stmt<R>>> statements;
         };
     }
 }

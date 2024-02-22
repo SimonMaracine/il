@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <utility>
 
 #include "runtime_error.hpp"
 
@@ -92,13 +93,13 @@ literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
 }
 
 literal::Object Interpreter::visit(ast::expr::Variable<literal::Object>* expr) {
-    return environment.get(expr->name);
+    return current_environment->get(expr->name);
 }
 
 literal::Object Interpreter::visit(ast::expr::Assignment<literal::Object>* expr) {
     const literal::Object value {evaluate(expr->value)};
 
-    environment.assign(expr->name, value);
+    current_environment->assign(expr->name, value);
 
     return value;
 }
@@ -144,13 +145,42 @@ literal::Object Interpreter::visit(const ast::stmt::Let<literal::Object>* stmt) 
         value = evaluate(stmt->initializer);
     }
 
-    environment.define(stmt->name.get_lexeme(), value);
+    current_environment->define(stmt->name.get_lexeme(), value);
+
+    return {};
+}
+
+literal::Object Interpreter::visit(const ast::stmt::Block<literal::Object>* stmt) {
+    execute_block(stmt->statements, Environment(current_environment));
 
     return {};
 }
 
 void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<literal::Object>> statement) {
     statement->accept(this);
+}
+
+void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements, Environment&& environment) {
+    Environment* previous {current_environment};
+
+    try {
+        // Allocate a new environment and set it as the current one
+        Environment block_environment {std::move(environment)};
+        current_environment = &block_environment;
+
+        for (const auto& statement : statements) {
+            execute(statement);
+        }
+    } catch (const RuntimeError&) {
+        // Reset the previous environment
+        current_environment = previous;
+
+        // Don't handle this exception here
+        throw;
+    }
+
+    // Reset the previous environment
+    current_environment = previous;
 }
 
 void Interpreter::check_number_operand(const Token& token, const literal::Object& right) const {
