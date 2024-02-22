@@ -13,6 +13,7 @@ void IlMain::run_file(const std::string& file_path) {
 
     if (!contents) {
         // FIXME error
+        std::cout << "Error reading file\n";
         return;
     }
 

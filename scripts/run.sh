@@ -7,4 +7,4 @@ if [ "$?" -ne 0 ]; then
 fi
 
 cd ../build/il
-./il
+./il ${@:1}
