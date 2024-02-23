@@ -6,9 +6,9 @@
 #include "context.hpp"
 #include "interpreter.hpp"
 
-class IlMain {
+class Il {
 public:
-    IlMain()
+    Il()
         : interpreter(&ctx) {}
 
     void run_file(const std::string& file_path);  // TODO maybe return code

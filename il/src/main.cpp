@@ -1,10 +1,10 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "il_main.hpp"
+#include "il.hpp"
 
 int main(int argc, char** argv) {
-    IlMain interpreter;
+    Il interpreter;
 
     if (argc > 2) {
         std::cout << "Invalid arguments\n";

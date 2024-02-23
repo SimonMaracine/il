@@ -1,4 +1,4 @@
-#include "il_main.hpp"
+#include "il.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -8,7 +8,7 @@
 #include "literal.hpp"
 #include "ast_printer.hpp"  // TODO temporary
 
-void IlMain::run_file(const std::string& file_path) {
+void Il::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
 
     if (!contents) {
@@ -29,7 +29,7 @@ void IlMain::run_file(const std::string& file_path) {
     }
 }
 
-void IlMain::run_repl() {
+void Il::run_repl() {
     while (true) {
         std::cout << "il> ";
 
@@ -56,7 +56,7 @@ void IlMain::run_repl() {
     }
 }
 
-void IlMain::run(const std::string& source_code) {
+void Il::run(const std::string& source_code) {
     Scanner scanner {source_code, &ctx};
     const auto tokens {scanner.scan()};
 
@@ -81,7 +81,7 @@ void IlMain::run(const std::string& source_code) {
     interpreter.interpret(statements);
 }
 
-std::optional<std::string> IlMain::read_file(const std::string& file_path) {
+std::optional<std::string> Il::read_file(const std::string& file_path) {
     std::ifstream stream {file_path, std::ios_base::binary};
 
     if (!stream.is_open()) {
