@@ -228,6 +228,8 @@ void Scanner::identifier() {
         { "null", TokenType::Null },
         { "or", TokenType::Or },
         { "and", TokenType::And },
+        { "if", TokenType::If },
+        { "else", TokenType::Else },
         { "print", TokenType::Print }
     };
 

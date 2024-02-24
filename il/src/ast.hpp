@@ -30,6 +30,9 @@ namespace ast {
         struct Assignment;
 
         template<typename R>
+        struct Logical;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(Literal<R>* expr) = 0;
             virtual R visit(Grouping<R>* expr) = 0;
@@ -37,6 +40,7 @@ namespace ast {
             virtual R visit(Binary<R>* expr) = 0;
             virtual R visit(Variable<R>* expr) = 0;
             virtual R visit(Assignment<R>* expr) = 0;
+            virtual R visit(Logical<R>* expr) = 0;
         };
 
         template<typename R>
@@ -121,6 +125,20 @@ namespace ast {
             Token name;
             std::shared_ptr<Expr<R>> value;
         };
+
+        template<typename R>
+        struct Logical : Expr<R> {
+            Logical(std::shared_ptr<Expr<R>> left, const Token& operator_, std::shared_ptr<Expr<R>> right)
+                : left(left), operator_(operator_), right(right) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> left;
+            Token operator_;
+            std::shared_ptr<Expr<R>> right;
+        };
     }
 
     namespace stmt {
@@ -136,6 +154,9 @@ namespace ast {
         struct Let;
 
         template<typename R>
+        struct If;
+
+        template<typename R>
         struct Block;
 
         template<typename R>
@@ -143,6 +164,7 @@ namespace ast {
             virtual R visit(const Expression<R>* stmt) = 0;
             virtual R visit(const Print<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
+            virtual R visit(const If<R>* stmt) = 0;
             virtual R visit(const Block<R>* stmt) = 0;
         };
 
@@ -188,6 +210,20 @@ namespace ast {
 
             Token name;
             std::shared_ptr<Expr<R>> initializer;
+        };
+
+        template<typename R>
+        struct If : Stmt<R> {
+            If(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> then_branch, std::shared_ptr<Stmt<R>> else_branch)
+                : condition(condition), then_branch(then_branch), else_branch(else_branch) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> condition;
+            std::shared_ptr<Stmt<R>> then_branch;
+            std::shared_ptr<Stmt<R>> else_branch;
         };
 
         template<typename R>

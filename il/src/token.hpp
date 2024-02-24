@@ -28,7 +28,7 @@ enum class TokenType {
     BangEqual, Greater, GreaterEqual, Less, LessEqual, EqualEqual,
 
     // Keywords
-    Let, True, False, Null, Or, And,
+    Let, True, False, Null, Or, And, If, Else,
 
     // Other
     Bang, Equal, Print
@@ -153,6 +153,12 @@ inline std::ostream& operator<<(std::ostream& stream, const TokenType token_type
             break;
         case TokenType::And:
             stream << "And";
+            break;
+        case TokenType::If:
+            stream << "If";
+            break;
+        case TokenType::Else:
+            stream << "Else";
             break;
         case TokenType::Print:
             stream << "Print";

@@ -104,6 +104,37 @@ literal::Object Interpreter::visit(ast::expr::Assignment<literal::Object>* expr)
     return value;
 }
 
+literal::Object Interpreter::visit(ast::expr::Logical<literal::Object>* expr) {
+    const literal::Object left {evaluate(expr->left)};
+
+    switch (expr->operator_.get_type()) {
+        case TokenType::Or:
+            // check_boolean_value(, value);  // FIXME
+
+            if (std::get<3u>(left)) {
+                return true;
+            }
+
+            break;
+        case TokenType::And:
+            // check_boolean_value(, value);  // FIXME
+
+            if (!std::get<3u>(left)) {
+                return false;
+            }
+
+            break;
+        default:
+            break;
+    }
+
+    const literal::Object right {evaluate(expr->right)};
+
+    // check_boolean_value(, value);  // FIXME
+
+    return std::get<3u>(right);
+}
+
 literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
     return expr->accept(this);
 }
@@ -150,6 +181,22 @@ literal::Object Interpreter::visit(const ast::stmt::Let<literal::Object>* stmt) 
     return {};
 }
 
+literal::Object Interpreter::visit(const ast::stmt::If<literal::Object>* stmt) {
+    const literal::Object value {evaluate(stmt->condition)};
+
+    // check_boolean_value(, value);  // FIXME
+
+    if (std::get<3u>(value)) {
+        execute(stmt->then_branch);
+    } else {
+        if (stmt->else_branch != nullptr) {
+            execute(stmt->else_branch);
+        }
+    }
+
+    return {};
+}
+
 literal::Object Interpreter::visit(const ast::stmt::Block<literal::Object>* stmt) {
     execute_block(stmt->statements, Environment(current_environment));
 
@@ -183,7 +230,7 @@ void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stm
     current_environment = previous;
 }
 
-void Interpreter::check_number_operand(const Token& token, const literal::Object& right) const {
+void Interpreter::check_number_operand(const Token& token, const literal::Object& right) {
     if (right.index() == 2u) {
         return;
     }
@@ -191,7 +238,7 @@ void Interpreter::check_number_operand(const Token& token, const literal::Object
     throw RuntimeError(token, "Operand must be a number");
 }
 
-void Interpreter::check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right) const {
+void Interpreter::check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right) {
     if (left.index() == 2u && right.index() == 2u) {
         return;
     }
@@ -199,10 +246,18 @@ void Interpreter::check_number_operands(const Token& token, const literal::Objec
     throw RuntimeError(token, "Operands must be numbers");
 }
 
-void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) const {
+void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) {
     if (right.index() == 3u) {
         return;
     }
 
     throw RuntimeError(token, "Operand must be a boolean expression");
+}
+
+void Interpreter::check_boolean_value(const Token& token, const literal::Object& value) {
+    if (value.index() == 3u) {
+        return;
+    }
+
+    throw RuntimeError(token, "Value must be a boolean expression");
 }

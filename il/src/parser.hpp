@@ -53,6 +53,10 @@ private:
             return std::make_shared<ast::stmt::Block<R>>(block<R>());
         }
 
+        if (match({TokenType::If})) {
+            return if_statement<R>();
+        }
+
         return expr_statement<R>();
     }
 
@@ -90,6 +94,24 @@ private:
     }
 
     template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> if_statement() {
+        consume(TokenType::LeftParen, "Expected `(` after `if`");
+
+        std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
+
+        consume(TokenType::RightParen, "Expected `)` after if condition");
+
+        std::shared_ptr<ast::stmt::Stmt<R>> then_branch {statement<R>()};
+        std::shared_ptr<ast::stmt::Stmt<R>> else_branch;
+
+        if (match({TokenType::Else})) {
+            else_branch = statement<R>();
+        }
+
+        return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch);
+    }
+
+    template<typename R>
     std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> block() {
         std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> statements;
 
@@ -109,7 +131,7 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> assignment() {
-        std::shared_ptr<ast::expr::Expr<R>> expr {equality<R>()};
+        std::shared_ptr<ast::expr::Expr<R>> expr {logic_or<R>()};
 
         if (match({TokenType::Equal})) {
             const Token& equals {previous()};
@@ -123,6 +145,32 @@ private:
             }
 
             error(equals, "Invalid assignment target");  // Don't enter panic mode
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::expr::Expr<R>> logic_or() {
+        std::shared_ptr<ast::expr::Expr<R>> expr {logic_and<R>()};
+
+        while (match({TokenType::Or})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<ast::expr::Expr<R>> right {logic_and<R>()};
+            expr = std::make_shared<ast::expr::Logical<R>>(expr, operator_, right);
+        }
+
+        return expr;
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::expr::Expr<R>> logic_and() {
+        std::shared_ptr<ast::expr::Expr<R>> expr {equality<R>()};
+
+        while (match({TokenType::And})) {
+            const Token& operator_ {previous()};
+            std::shared_ptr<ast::expr::Expr<R>> right {equality<R>()};
+            expr = std::make_shared<ast::expr::Logical<R>>(expr, operator_, right);
         }
 
         return expr;

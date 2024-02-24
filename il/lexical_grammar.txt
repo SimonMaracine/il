@@ -2,7 +2,7 @@ program         : statement* EOF ;
 
 declaration     : var_declaration | statement ;
 
-statement       : expr_statement | print_statement | block ;
+statement       : expr_statement | print_statement | block | if_statement ;
 
 var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
 
@@ -10,12 +10,18 @@ expr_statement  : expression ";" ;
 
 print_statement : "print" expression ";" ;
 
+if_statement    : "if" "(" expression ")" statement ( "else" statement )* ;
+
 block           : "{" declaration* "}" ;
 
 
 expression      : assignment ;
 
-assignment      : IDENTIFIER "=" assignment | equality ;
+assignment      : IDENTIFIER "=" assignment | logic_or ;
+
+logic_or        : logic_and ( "or" logic_and )* ;
+
+logic_and       : equality ( "and" equality )* ;
 
 equality        : comparison ( ( "!=" | "==" ) comparison )* ;
 
