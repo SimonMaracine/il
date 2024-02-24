@@ -30,6 +30,7 @@ private:
     literal::Object visit(const ast::stmt::Print<literal::Object>* stmt) override;
     literal::Object visit(const ast::stmt::Let<literal::Object>* stmt) override;
     literal::Object visit(const ast::stmt::If<literal::Object>* stmt) override;
+    literal::Object visit(const ast::stmt::While<literal::Object>* stmt) override;
     literal::Object visit(const ast::stmt::Block<literal::Object>* stmt) override;
 
     void execute(std::shared_ptr<ast::stmt::Stmt<literal::Object>> statement);

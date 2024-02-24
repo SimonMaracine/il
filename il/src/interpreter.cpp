@@ -197,6 +197,22 @@ literal::Object Interpreter::visit(const ast::stmt::If<literal::Object>* stmt) {
     return {};
 }
 
+literal::Object Interpreter::visit(const ast::stmt::While<literal::Object>* stmt) {
+    while (true) {
+        const literal::Object value {evaluate(stmt->condition)};
+
+        // check_boolean_value(, value);  // FIXME
+
+        if (!std::get<3u>(value)) {
+            break;
+        }
+
+        execute(stmt->body);
+    }
+
+    return {};
+}
+
 literal::Object Interpreter::visit(const ast::stmt::Block<literal::Object>* stmt) {
     execute_block(stmt->statements, Environment(current_environment));
 

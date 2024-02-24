@@ -57,6 +57,10 @@ private:
             return if_statement<R>();
         }
 
+        if (match({TokenType::While})) {
+            return while_statement<R>();
+        }
+
         return expr_statement<R>();
     }
 
@@ -109,6 +113,19 @@ private:
         }
 
         return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch);
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> while_statement() {
+        consume(TokenType::LeftParen, "Expected `(` after `if`");
+
+        std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
+
+        consume(TokenType::RightParen, "Expected `)` after if condition");
+
+        std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
+
+        return std::make_shared<ast::stmt::While<R>>(condition, body);
     }
 
     template<typename R>

@@ -2,7 +2,7 @@ program         : statement* EOF ;
 
 declaration     : var_declaration | statement ;
 
-statement       : expr_statement | print_statement | block | if_statement ;
+statement       : expr_statement | print_statement | block | if_statement | while_statement ;
 
 var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
 
@@ -11,6 +11,8 @@ expr_statement  : expression ";" ;
 print_statement : "print" expression ";" ;
 
 if_statement    : "if" "(" expression ")" statement ( "else" statement )* ;
+
+while_statement : "while" "(" expression ")" statement ;
 
 block           : "{" declaration* "}" ;
 

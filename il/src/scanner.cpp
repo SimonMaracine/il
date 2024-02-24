@@ -230,6 +230,7 @@ void Scanner::identifier() {
         { "and", TokenType::And },
         { "if", TokenType::If },
         { "else", TokenType::Else },
+        { "while", TokenType::While },
         { "print", TokenType::Print }
     };
 

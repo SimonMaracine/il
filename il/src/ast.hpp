@@ -157,6 +157,9 @@ namespace ast {
         struct If;
 
         template<typename R>
+        struct While;
+
+        template<typename R>
         struct Block;
 
         template<typename R>
@@ -165,6 +168,7 @@ namespace ast {
             virtual R visit(const Print<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
             virtual R visit(const If<R>* stmt) = 0;
+            virtual R visit(const While<R>* stmt) = 0;
             virtual R visit(const Block<R>* stmt) = 0;
         };
 
@@ -224,6 +228,19 @@ namespace ast {
             std::shared_ptr<Expr<R>> condition;
             std::shared_ptr<Stmt<R>> then_branch;
             std::shared_ptr<Stmt<R>> else_branch;
+        };
+
+        template<typename R>
+        struct While : Stmt<R> {
+            While(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> body)
+                : condition(condition), body(body) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> condition;
+            std::shared_ptr<Stmt<R>> body;
         };
 
         template<typename R>
