@@ -32,7 +32,7 @@ private:
     std::shared_ptr<ast::stmt::Stmt<R>> declaration() {
         try {
             if (match({TokenType::Let})) {
-                return var_statement<R>();
+                return var_declaration<R>();
             }
 
             return statement<R>();
@@ -61,11 +61,15 @@ private:
             return while_statement<R>();
         }
 
+        if (match({TokenType::For})) {
+            return for_statement<R>();
+        }
+
         return expr_statement<R>();
     }
 
     template<typename R>
-    std::shared_ptr<ast::stmt::Stmt<R>> var_statement() {
+    std::shared_ptr<ast::stmt::Stmt<R>> var_declaration() {
         const Token& name {consume(TokenType::Identifier, "Expected a variable name")};
 
         std::shared_ptr<ast::expr::Expr<R>> initializer;
@@ -117,15 +121,74 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> while_statement() {
-        consume(TokenType::LeftParen, "Expected `(` after `if`");
+        consume(TokenType::LeftParen, "Expected `(` after `while`");
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
-        consume(TokenType::RightParen, "Expected `)` after if condition");
+        consume(TokenType::RightParen, "Expected `)` after while condition");
 
         std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
 
         return std::make_shared<ast::stmt::While<R>>(condition, body);
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> for_statement() {
+        consume(TokenType::LeftParen, "Expected `(` after `for`");
+
+        std::shared_ptr<ast::stmt::Stmt<R>> initializer;
+
+        if (match({TokenType::Semicolon})) {
+            initializer = nullptr;
+        } else if (match({TokenType::Let})) {
+            initializer = var_declaration<R>();
+        } else {
+            initializer = expr_statement<R>();
+        }
+
+        std::shared_ptr<ast::expr::Expr<R>> condition;
+
+        if (!check(TokenType::Semicolon)) {
+            condition = expression<R>();
+        }
+
+        consume(TokenType::Semicolon, "Expected `;` after loop condition");
+
+        std::shared_ptr<ast::expr::Expr<R>> post_expression;
+
+        if (!check(TokenType::RightParen)) {
+            post_expression = expression<R>();
+        }
+
+        consume(TokenType::RightParen, "Expected `)` after loop clauses");
+
+        std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
+
+        if (post_expression != nullptr) {
+            body = std::make_shared<ast::stmt::Block<R>>(
+                std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> {
+                    body,
+                    std::make_shared<ast::stmt::Expression<R>>(post_expression)
+                }
+            );
+        }
+
+        if (condition == nullptr) {
+            condition = std::make_shared<ast::expr::Literal<R>>(true);
+        }
+
+        body = std::make_shared<ast::stmt::While<R>>(condition, body);
+
+        if (initializer != nullptr) {
+            body = std::make_shared<ast::stmt::Block<R>>(
+                std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> {
+                    initializer,
+                    body
+                }
+            );
+        }
+
+        return body;
     }
 
     template<typename R>

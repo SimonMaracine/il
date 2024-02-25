@@ -28,7 +28,7 @@ enum class TokenType {
     BangEqual, Greater, GreaterEqual, Less, LessEqual, EqualEqual,
 
     // Keywords
-    Let, True, False, Null, Or, And, If, Else, While,
+    Let, True, False, Null, Or, And, If, Else, While, For,
 
     // Other
     Bang, Equal, Print
@@ -162,6 +162,9 @@ inline std::ostream& operator<<(std::ostream& stream, const TokenType token_type
             break;
         case TokenType::While:
             stream << "While";
+            break;
+        case TokenType::For:
+            stream << "For";
             break;
         case TokenType::Print:
             stream << "Print";
