@@ -12,13 +12,13 @@ public:
     Scanner(const std::string& source_code, Context* ctx)
         : source_code(source_code), ctx(ctx) {}
 
-    std::vector<Token> scan();
+    std::vector<token::Token> scan();
 private:
     void scan_token();
     char advance();
-    void add_token(TokenType type);
-    void add_token(TokenType type, std::string&& value);
-    void add_token(TokenType type, double value);
+    void add_token(token::TokenType type);
+    void add_token(token::TokenType type, std::string&& value);
+    void add_token(token::TokenType type, double value);
     bool match(char character);
     char peek();
     char peekTwo();
@@ -32,7 +32,7 @@ private:
     double parse_double(const std::string& string);
 
     std::string source_code;
-    std::vector<Token> tokens;
+    std::vector<token::Token> tokens;
 
     std::size_t start {};  // First character in the lexeme currently scanned
     std::size_t current {};  // Current in source string

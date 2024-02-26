@@ -6,9 +6,9 @@
 
 #include "runtime_error.hpp"
 
-void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements) {
+void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
     try {
-        for (const std::shared_ptr<ast::stmt::Stmt<literal::Object>>& statement : statements) {
+        for (const std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>& statement : statements) {
             execute(statement);
         }
     } catch (const RuntimeError& e) {
@@ -16,24 +16,26 @@ void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<li
     }
 }
 
-literal::Object Interpreter::visit(ast::expr::Literal<literal::Object>* expr) {
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Literal<std::shared_ptr<object::Object>>* expr) {
     return expr->value;
 }
 
-literal::Object Interpreter::visit(ast::expr::Grouping<literal::Object>* expr) {
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Grouping<std::shared_ptr<object::Object>>* expr) {
     return evaluate(expr->expression);
 }
 
-literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
-    const literal::Object right {evaluate(expr->right)};
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> right {evaluate(expr->right)};
 
     switch (expr->operator_.get_type()) {
-        case TokenType::Minus:
+        case token::TokenType::Minus:
             check_number_operand(expr->operator_, right);
-            return -std::get<2u>(right);
-        case TokenType::Bang:
+            // return -std::get<2u>(right);
+            return object::create<object::Number>(-object::cast<object::Number>(right)->value);
+        case token::TokenType::Bang:
             check_boolean_operand(expr->operator_, right);
-            return !std::get<3u>(right);
+            // return !std::get<3u>(right);
+            return object::create<object::Boolean>(!object::cast<object::Boolean>(right)->value);
         default:
             break;
     }
@@ -42,48 +44,59 @@ literal::Object Interpreter::visit(ast::expr::Unary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
-    const literal::Object left {evaluate(expr->left)};
-    const literal::Object right {evaluate(expr->right)};
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> left {evaluate(expr->left)};
+    std::shared_ptr<object::Object> right {evaluate(expr->right)};
 
     switch (expr->operator_.get_type()) {
-        case TokenType::Minus:
+        case token::TokenType::Minus:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) - std::get<2u>(right);
-        case TokenType::Plus:
-            if (left.index() == 2u && right.index() == 2u) {
-                return std::get<2u>(left) + std::get<2u>(right);
+            // return std::get<2u>(left) - std::get<2u>(right);
+            return object::create<object::Number>(object::cast<object::Number>(left)->value - object::cast<object::Number>(right)->value);
+        case token::TokenType::Plus:
+            if (left->type == object::Type::Number && right->type == object::Type::Number) {
+                // return std::get<2u>(left) + std::get<2u>(right);
+                return object::create<object::Number>(object::cast<object::Number>(left)->value + object::cast<object::Number>(right)->value);
             }
 
-            if (left.index() == 1u && right.index() == 1u) {
-                return std::get<1u>(left) + std::get<1u>(right);
+            if (left->type == object::Type::String && right->type == object::Type::String) {
+                // return std::get<1u>(left) + std::get<1u>(right);
+                return object::create<object::String>(object::cast<object::String>(left)->value + object::cast<object::String>(right)->value);
             }
 
             throw RuntimeError(expr->operator_, "Operands must be either numbers or strings");
-        case TokenType::Slash:
+        case token::TokenType::Slash:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) / std::get<2u>(right);
-        case TokenType::Star:
+            // return std::get<2u>(left) / std::get<2u>(right);
+            return object::create<object::Number>(object::cast<object::Number>(left)->value / object::cast<object::Number>(right)->value);
+        case token::TokenType::Star:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) * std::get<2u>(right);
-        case TokenType::Greater:
+            // return std::get<2u>(left) * std::get<2u>(right);
+            return object::create<object::Number>(object::cast<object::Number>(left)->value * object::cast<object::Number>(right)->value);
+        case token::TokenType::Greater:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) > std::get<2u>(right);
-        case TokenType::GreaterEqual:
+            // return std::get<2u>(left) > std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value > object::cast<object::Number>(right)->value);
+        case token::TokenType::GreaterEqual:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) >= std::get<2u>(right);
-        case TokenType::Less:
+            // return std::get<2u>(left) >= std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value >= object::cast<object::Number>(right)->value);
+        case token::TokenType::Less:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) < std::get<2u>(right);
-        case TokenType::LessEqual:
+            // return std::get<2u>(left) < std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value < object::cast<object::Number>(right)->value);
+        case token::TokenType::LessEqual:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) <= std::get<2u>(right);
-        case TokenType::BangEqual:
+            // return std::get<2u>(left) <= std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value <= object::cast<object::Number>(right)->value);
+        case token::TokenType::BangEqual:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) != std::get<2u>(right);
-        case TokenType::EqualEqual:
+            // return std::get<2u>(left) != std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value != object::cast<object::Number>(right)->value);
+        case token::TokenType::EqualEqual:
             check_number_operands(expr->operator_, left, right);
-            return std::get<2u>(left) == std::get<2u>(right);
+            // return std::get<2u>(left) == std::get<2u>(right);
+            return object::create<object::Boolean>(object::cast<object::Number>(left)->value == object::cast<object::Number>(right)->value);
         default:
             break;
     }
@@ -92,35 +105,37 @@ literal::Object Interpreter::visit(ast::expr::Binary<literal::Object>* expr) {
     return {};
 }
 
-literal::Object Interpreter::visit(ast::expr::Variable<literal::Object>* expr) {
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Variable<std::shared_ptr<object::Object>>* expr) {
     return current_environment->get(expr->name);
 }
 
-literal::Object Interpreter::visit(ast::expr::Assignment<literal::Object>* expr) {
-    const literal::Object value {evaluate(expr->value)};
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Assignment<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> value {evaluate(expr->value)};
 
     current_environment->assign(expr->name, value);
 
     return value;
 }
 
-literal::Object Interpreter::visit(ast::expr::Logical<literal::Object>* expr) {
-    const literal::Object left {evaluate(expr->left)};
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> left {evaluate(expr->left)};
 
     switch (expr->operator_.get_type()) {
-        case TokenType::Or:
+        case token::TokenType::Or:
             // check_boolean_value(, value);  // FIXME
 
-            if (std::get<3u>(left)) {
-                return true;
+            if (object::cast<object::Boolean>(left)->value) {
+                // return true;
+                return object::create<object::Boolean>(true);
             }
 
             break;
-        case TokenType::And:
+        case token::TokenType::And:
             // check_boolean_value(, value);  // FIXME
 
-            if (!std::get<3u>(left)) {
-                return false;
+            if (!object::cast<object::Boolean>(left)->value) {
+                // return false;
+                return object::create<object::Boolean>(false);
             }
 
             break;
@@ -128,38 +143,38 @@ literal::Object Interpreter::visit(ast::expr::Logical<literal::Object>* expr) {
             break;
     }
 
-    const literal::Object right {evaluate(expr->right)};
+    std::shared_ptr<object::Object> right {evaluate(expr->right)};
 
     // check_boolean_value(, value);  // FIXME
 
-    return std::get<3u>(right);
+    return object::create<object::Boolean>(object::cast<object::Boolean>(right)->value);
 }
 
-literal::Object Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr) {
+std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr) {
     return expr->accept(this);
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Expression<literal::Object>* stmt) {
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) {
     evaluate(stmt->expression);
 
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt) {
-    const literal::Object value {evaluate(stmt->expression)};
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Print<std::shared_ptr<object::Object>>* stmt) {
+    std::shared_ptr<object::Object> value {evaluate(stmt->expression)};
 
-    switch (value.index()) {
-        case 0u:
-            std::cout << "null" << '\n';
+    switch (value->type) {
+        case object::Type::None:
+            std::cout << "none" << '\n';
             break;
-        case 1u:
-            std::cout << std::get<1u>(value) << '\n';
+        case object::Type::String:
+            std::cout << object::cast<object::String>(value)->value << '\n';
             break;
-        case 2u:
-            std::cout << std::get<2u>(value) << '\n';
+        case object::Type::Number:
+            std::cout << object::cast<object::Number>(value)->value << '\n';
             break;
-        case 3u:
-            std::cout << (std::get<3u>(value) ? "true" : "false") << '\n';
+        case object::Type::Boolean:
+            std::cout << (object::cast<object::Boolean>(value)->value ? "true" : "false") << '\n';
             break;
         default:
             assert(false);
@@ -169,8 +184,8 @@ literal::Object Interpreter::visit(const ast::stmt::Print<literal::Object>* stmt
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Let<literal::Object>* stmt) {
-    literal::Object value;
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) {
+    std::shared_ptr<object::Object> value;
 
     if (stmt->initializer != nullptr) {
         value = evaluate(stmt->initializer);
@@ -181,12 +196,12 @@ literal::Object Interpreter::visit(const ast::stmt::Let<literal::Object>* stmt) 
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::If<literal::Object>* stmt) {
-    const literal::Object value {evaluate(stmt->condition)};
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
+    std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
     // check_boolean_value(, value);  // FIXME
 
-    if (std::get<3u>(value)) {
+    if (object::cast<object::Boolean>(value)->value) {
         execute(stmt->then_branch);
     } else {
         if (stmt->else_branch != nullptr) {
@@ -197,13 +212,13 @@ literal::Object Interpreter::visit(const ast::stmt::If<literal::Object>* stmt) {
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::While<literal::Object>* stmt) {
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) {
     while (true) {
-        const literal::Object value {evaluate(stmt->condition)};
+        std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
         // check_boolean_value(, value);  // FIXME
 
-        if (!std::get<3u>(value)) {
+        if (!object::cast<object::Boolean>(value)->value) {
             break;
         }
 
@@ -213,17 +228,17 @@ literal::Object Interpreter::visit(const ast::stmt::While<literal::Object>* stmt
     return {};
 }
 
-literal::Object Interpreter::visit(const ast::stmt::Block<literal::Object>* stmt) {
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) {
     execute_block(stmt->statements, Environment(current_environment));
 
     return {};
 }
 
-void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<literal::Object>> statement) {
+void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement) {
     statement->accept(this);
 }
 
-void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements, Environment&& environment) {
+void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements, Environment&& environment) {
     Environment* previous {current_environment};
 
     try {
@@ -246,32 +261,32 @@ void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stm
     current_environment = previous;
 }
 
-void Interpreter::check_number_operand(const Token& token, const literal::Object& right) {
-    if (right.index() == 2u) {
+void Interpreter::check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {
+    if (right->type == object::Type::Number) {
         return;
     }
 
     throw RuntimeError(token, "Operand must be a number");
 }
 
-void Interpreter::check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right) {
-    if (left.index() == 2u && right.index() == 2u) {
+void Interpreter::check_number_operands(const token::Token& token, const std::shared_ptr<object::Object>& left, const std::shared_ptr<object::Object>& right) {
+    if (left->type == object::Type::Number && right->type == object::Type::Number) {
         return;
     }
 
     throw RuntimeError(token, "Operands must be numbers");
 }
 
-void Interpreter::check_boolean_operand(const Token& token, const literal::Object& right) {
-    if (right.index() == 3u) {
+void Interpreter::check_boolean_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {
+    if (right->type == object::Type::Boolean) {
         return;
     }
 
     throw RuntimeError(token, "Operand must be a boolean expression");
 }
 
-void Interpreter::check_boolean_value(const Token& token, const literal::Object& value) {
-    if (value.index() == 3u) {
+void Interpreter::check_boolean_value(const token::Token& token, const std::shared_ptr<object::Object>& value) {
+    if (value->type == object::Type::Boolean) {
         return;
     }
 

@@ -2,8 +2,9 @@
 
 #include <unordered_map>
 #include <string>
+#include <memory>
 
-#include "literal.hpp"
+#include "object.hpp"
 #include "token.hpp"
 
 class Environment {
@@ -13,10 +14,10 @@ public:
     Environment(Environment* enclosing)
         : enclosing(enclosing) {}
 
-    void define(const std::string& name, const literal::Object& value = literal::Null());
-    literal::Object get(const Token& name) const;
-    void assign(const Token& name, const literal::Object& value);
+    void define(const std::string& name, std::shared_ptr<object::Object> value);
+    std::shared_ptr<object::Object> get(const token::Token& name) const;
+    void assign(const token::Token& name, std::shared_ptr<object::Object> value);
 private:
-    std::unordered_map<std::string, literal::Object> values;
+    std::unordered_map<std::string, std::shared_ptr<object::Object>> values;
     Environment* enclosing {nullptr};
 };

@@ -3,20 +3,22 @@
 #include <sstream>
 #include <cassert>
 
+#include "object.hpp"
+
 std::string AstPrinter::print(std::shared_ptr<ast::expr::Expr<std::string>> expr) {
     return expr->accept(this);
 }
 
 std::string AstPrinter::visit(ast::expr::Literal<std::string>* expr) {
-    switch (expr->value.index()) {
-        case 0u:
-            return "null";
-        case 1u:
-            return std::get<1u>(expr->value);
-        case 2u:
-            return std::to_string(std::get<2u>(expr->value));
-        case 3u:
-            return std::to_string(std::get<3u>(expr->value));
+    switch (expr->value->type) {
+        case object::Type::None:
+            return "none";
+        case object::Type::String:
+            return object::cast<object::String>(expr->value)->value;
+        case object::Type::Number:
+            return std::to_string(object::cast<object::Number>(expr->value)->value);
+        case object::Type::Boolean:
+            return std::to_string(object::cast<object::Boolean>(expr->value)->value);
         default:
             assert(false);
             break;

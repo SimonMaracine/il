@@ -5,7 +5,7 @@
 #include <utility>
 #include <unordered_map>
 
-std::vector<Token> Scanner::scan() {
+std::vector<token::Token> Scanner::scan() {
     while (!reached_end()) {
         // Beginning of the next lexeme
         start = current;
@@ -13,7 +13,7 @@ std::vector<Token> Scanner::scan() {
         scan_token();
     }
 
-    tokens.emplace_back(TokenType::Eof, "", line);
+    tokens.emplace_back(token::TokenType::Eof, "", line);
 
     return tokens;
 }
@@ -25,31 +25,31 @@ void Scanner::scan_token() {
 
     switch (character) {
         case '(':
-            add_token(TokenType::LeftParen);
+            add_token(token::TokenType::LeftParen);
             break;
         case ')':
-            add_token(TokenType::RightParen);
+            add_token(token::TokenType::RightParen);
             break;
         case '{':
-            add_token(TokenType::LeftBrace);
+            add_token(token::TokenType::LeftBrace);
             break;
         case '}':
-            add_token(TokenType::RightBrace);
+            add_token(token::TokenType::RightBrace);
             break;
         case ',':
-            add_token(TokenType::Comma);
+            add_token(token::TokenType::Comma);
             break;
         case '.':
-            add_token(TokenType::Dot);
+            add_token(token::TokenType::Dot);
             break;
         case ';':
-            add_token(TokenType::Semicolon);
+            add_token(token::TokenType::Semicolon);
             break;
         case '-':
-            add_token(TokenType::Minus);
+            add_token(token::TokenType::Minus);
             break;
         case '+':
-            add_token(TokenType::Plus);
+            add_token(token::TokenType::Plus);
             break;
         case '/':
             if (match('/')) {
@@ -57,23 +57,23 @@ void Scanner::scan_token() {
                     advance();
                 }
             } else {
-                add_token(TokenType::Slash);
+                add_token(token::TokenType::Slash);
             }
             break;
         case '*':
-            add_token(TokenType::Star);
+            add_token(token::TokenType::Star);
             break;
         case '!':
-            add_token(match('=') ? TokenType::BangEqual : TokenType::Bang);
+            add_token(match('=') ? token::TokenType::BangEqual : token::TokenType::Bang);
             break;
         case '>':
-            add_token(match('=') ? TokenType::GreaterEqual : TokenType::Greater);
+            add_token(match('=') ? token::TokenType::GreaterEqual : token::TokenType::Greater);
             break;
         case '<':
-            add_token(match('=') ? TokenType::LessEqual : TokenType::Less);
+            add_token(match('=') ? token::TokenType::LessEqual : token::TokenType::Less);
             break;
         case '=':
-            add_token(match('=') ? TokenType::EqualEqual : TokenType::Equal);
+            add_token(match('=') ? token::TokenType::EqualEqual : token::TokenType::Equal);
             break;
         case '"':
             string();
@@ -110,15 +110,15 @@ char Scanner::advance() {
     return source_code[current++];
 }
 
-void Scanner::add_token(TokenType type) {
+void Scanner::add_token(token::TokenType type) {
     tokens.emplace_back(type, source_code.substr(start, current - start), line);
 }
 
-void Scanner::add_token(TokenType type, std::string&& value) {
+void Scanner::add_token(token::TokenType type, std::string&& value) {
     tokens.emplace_back(type, source_code.substr(start, current - start), line, std::move(value));
 }
 
-void Scanner::add_token(TokenType type, double value) {
+void Scanner::add_token(token::TokenType type, double value) {
     tokens.emplace_back(type, source_code.substr(start, current - start), line, value);
 }
 
@@ -196,7 +196,7 @@ void Scanner::string() {
     // Consume the closing quote
     advance();
 
-    add_token(TokenType::String, source_code.substr(start + 1u, current - start - 2u));
+    add_token(token::TokenType::String, source_code.substr(start + 1u, current - start - 2u));
 }
 
 void Scanner::number() {
@@ -213,7 +213,7 @@ void Scanner::number() {
         }
     }
 
-    add_token(TokenType::Number, parse_double(source_code.substr(start, current - start)));
+    add_token(token::TokenType::Number, parse_double(source_code.substr(start, current - start)));
 }
 
 void Scanner::identifier() {
@@ -221,18 +221,18 @@ void Scanner::identifier() {
         advance();
     }
 
-    static const std::unordered_map<std::string, TokenType> KEYWORDS {
-        { "let", TokenType::Let },
-        { "true", TokenType::True },
-        { "false", TokenType::False },
-        { "null", TokenType::Null },
-        { "or", TokenType::Or },
-        { "and", TokenType::And },
-        { "if", TokenType::If },
-        { "else", TokenType::Else },
-        { "while", TokenType::While },
-        { "for", TokenType::For },
-        { "print", TokenType::Print }
+    static const std::unordered_map<std::string, token::TokenType> KEYWORDS {
+        { "let", token::TokenType::Let },
+        { "true", token::TokenType::True },
+        { "false", token::TokenType::False },
+        { "none", token::TokenType::None },
+        { "or", token::TokenType::Or },
+        { "and", token::TokenType::And },
+        { "if", token::TokenType::If },
+        { "else", token::TokenType::Else },
+        { "while", token::TokenType::While },
+        { "for", token::TokenType::For },
+        { "print", token::TokenType::Print }
     };
 
     const auto word {source_code.substr(start, current - start)};
@@ -242,7 +242,7 @@ void Scanner::identifier() {
         return;
     }
 
-    add_token(TokenType::Identifier);
+    add_token(token::TokenType::Identifier);
 }
 
 double Scanner::parse_double(const std::string& string) {

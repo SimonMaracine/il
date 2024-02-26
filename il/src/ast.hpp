@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "token.hpp"
-#include "literal.hpp"
+#include "object.hpp"
 
 namespace ast {
     namespace expr {
@@ -52,14 +52,14 @@ namespace ast {
 
         template<typename R>
         struct Literal : Expr<R> {
-            Literal(const literal::Object& value)
+            Literal(std::shared_ptr<object::Object> value)
                 : value(value) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
-            literal::Object value;
+            std::shared_ptr<object::Object> value;
         };
 
         template<typename R>
@@ -76,20 +76,20 @@ namespace ast {
 
         template<typename R>
         struct Unary : Expr<R> {
-            Unary(const Token& operator_, std::shared_ptr<Expr<R>> right)
+            Unary(const token::Token& operator_, std::shared_ptr<Expr<R>> right)
                 : operator_(operator_), right(right) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
-            Token operator_;
+            token::Token operator_;
             std::shared_ptr<Expr<R>> right;
         };
 
         template<typename R>
         struct Binary : Expr<R> {
-            Binary(std::shared_ptr<Expr<R>> left, const Token& operator_, std::shared_ptr<Expr<R>> right)
+            Binary(std::shared_ptr<Expr<R>> left, const token::Token& operator_, std::shared_ptr<Expr<R>> right)
                 : left(left), operator_(operator_), right(right) {}
 
             R accept(Visitor<R>* visitor) override {
@@ -97,38 +97,38 @@ namespace ast {
             }
 
             std::shared_ptr<Expr<R>> left;
-            Token operator_;
+            token::Token operator_;
             std::shared_ptr<Expr<R>> right;
         };
 
         template<typename R>
         struct Variable : Expr<R> {
-            Variable(const Token& name)
+            Variable(const token::Token& name)
                 : name(name) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
-            Token name;
+            token::Token name;
         };
 
         template<typename R>
         struct Assignment : Expr<R> {
-            Assignment(const Token& name, std::shared_ptr<Expr<R>> value)
+            Assignment(const token::Token& name, std::shared_ptr<Expr<R>> value)
                 : name(name), value(value) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
-            Token name;
+            token::Token name;
             std::shared_ptr<Expr<R>> value;
         };
 
         template<typename R>
         struct Logical : Expr<R> {
-            Logical(std::shared_ptr<Expr<R>> left, const Token& operator_, std::shared_ptr<Expr<R>> right)
+            Logical(std::shared_ptr<Expr<R>> left, const token::Token& operator_, std::shared_ptr<Expr<R>> right)
                 : left(left), operator_(operator_), right(right) {}
 
             R accept(Visitor<R>* visitor) override {
@@ -136,7 +136,7 @@ namespace ast {
             }
 
             std::shared_ptr<Expr<R>> left;
-            Token operator_;
+            token::Token operator_;
             std::shared_ptr<Expr<R>> right;
         };
     }
@@ -205,14 +205,14 @@ namespace ast {
 
         template<typename R>
         struct Let : Stmt<R> {
-            Let(const Token& name, std::shared_ptr<Expr<R>> initializer)
+            Let(const token::Token& name, std::shared_ptr<Expr<R>> initializer)
                 : name(name), initializer(initializer) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
             }
 
-            Token name;
+            token::Token name;
             std::shared_ptr<Expr<R>> initializer;
         };
 

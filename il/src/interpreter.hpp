@@ -4,42 +4,42 @@
 #include <vector>
 
 #include "ast.hpp"
-#include "literal.hpp"
+#include "object.hpp"
 #include "token.hpp"
 #include "context.hpp"
 #include "environment.hpp"
 
-class Interpreter : ast::expr::Visitor<literal::Object>, ast::stmt::Visitor<literal::Object> {
+class Interpreter : ast::expr::Visitor<std::shared_ptr<object::Object>>, ast::stmt::Visitor<std::shared_ptr<object::Object>> {
 public:
     Interpreter(Context* ctx)
         : current_environment(&global_environment), ctx(ctx) {}
 
-    void interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements);
+    void interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements);
 private:
-    literal::Object visit(ast::expr::Literal<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Grouping<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Unary<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Binary<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Variable<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Assignment<literal::Object>* expr) override;
-    literal::Object visit(ast::expr::Logical<literal::Object>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Literal<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Grouping<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Unary<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Binary<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Variable<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Assignment<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Logical<std::shared_ptr<object::Object>>* expr) override;
 
-    literal::Object evaluate(std::shared_ptr<ast::expr::Expr<literal::Object>> expr);
+    std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr);
 
-    literal::Object visit(const ast::stmt::Expression<literal::Object>* stmt) override;
-    literal::Object visit(const ast::stmt::Print<literal::Object>* stmt) override;
-    literal::Object visit(const ast::stmt::Let<literal::Object>* stmt) override;
-    literal::Object visit(const ast::stmt::If<literal::Object>* stmt) override;
-    literal::Object visit(const ast::stmt::While<literal::Object>* stmt) override;
-    literal::Object visit(const ast::stmt::Block<literal::Object>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Print<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) override;
 
-    void execute(std::shared_ptr<ast::stmt::Stmt<literal::Object>> statement);
-    void execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<literal::Object>>>& statements, Environment&& environment);
+    void execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement);
+    void execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements, Environment&& environment);
 
-    static void check_number_operand(const Token& token, const literal::Object& right);
-    static void check_number_operands(const Token& token, const literal::Object& left, const literal::Object& right);
-    static void check_boolean_operand(const Token& token, const literal::Object& right);
-    static void check_boolean_value(const Token& token, const literal::Object& value);
+    static void check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right);
+    static void check_number_operands(const token::Token& token, const std::shared_ptr<object::Object>& left, const std::shared_ptr<object::Object>& right);
+    static void check_boolean_operand(const token::Token& token, const std::shared_ptr<object::Object>& right);
+    static void check_boolean_value(const token::Token& token, const std::shared_ptr<object::Object>& value);
 
     Environment global_environment;
     Environment* current_environment {nullptr};

@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <fstream>
+#include <cstddef>
+#include <memory>
 
 #include "scanner.hpp"
 #include "parser.hpp"
-#include "literal.hpp"
+#include "object.hpp"
 #include "ast_printer.hpp"  // TODO temporary
 
 void Il::run_file(const std::string& file_path) {
@@ -73,7 +75,7 @@ void Il::run(const std::string& source_code) {
     std::cout << AstPrinter().print(expr) << '\n';
 #endif
 
-    const auto statements {parser.parse<literal::Object>()};
+    const auto statements {parser.parse<std::shared_ptr<object::Object>>()};
 
     if (ctx.had_error) {
         return;

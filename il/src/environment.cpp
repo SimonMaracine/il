@@ -2,11 +2,11 @@
 
 #include "runtime_error.hpp"
 
-void Environment::define(const std::string& name, const literal::Object& value) {
+void Environment::define(const std::string& name, std::shared_ptr<object::Object> value) {
     values[name] = value;
 }
 
-literal::Object Environment::get(const Token& name) const {
+std::shared_ptr<object::Object> Environment::get(const token::Token& name) const {
     if (values.find(name.get_lexeme()) != values.cend()) {
         return values.at(name.get_lexeme());
     }
@@ -18,7 +18,7 @@ literal::Object Environment::get(const Token& name) const {
     throw RuntimeError(name, "Undefined variable `" + name.get_lexeme() + "`");
 }
 
-void Environment::assign(const Token& name, const literal::Object& value) {
+void Environment::assign(const token::Token& name, std::shared_ptr<object::Object> value) {
     if (values.find(name.get_lexeme()) != values.cend()) {
         values.at(name.get_lexeme()) = value;
         return;

@@ -5,14 +5,16 @@
 #include <memory>
 #include <initializer_list>
 #include <string>
+#include <cassert>
 
 #include "token.hpp"
 #include "ast.hpp"
 #include "context.hpp"
+#include "object.hpp"
 
 class Parser {
 public:
-    Parser(const std::vector<Token>& tokens, Context* ctx)
+    Parser(const std::vector<token::Token>& tokens, Context* ctx)
         : tokens(tokens), ctx(ctx) {}
 
     template<typename R>
@@ -31,7 +33,7 @@ private:
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> declaration() {
         try {
-            if (match({TokenType::Let})) {
+            if (match({token::TokenType::Let})) {
                 return var_declaration<R>();
             }
 
@@ -45,23 +47,23 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> statement() {
-        if (match({TokenType::Print})) {
+        if (match({token::TokenType::Print})) {
             return print_statement<R>();
         }
 
-        if (match({TokenType::LeftBrace})) {
+        if (match({token::TokenType::LeftBrace})) {
             return std::make_shared<ast::stmt::Block<R>>(block<R>());
         }
 
-        if (match({TokenType::If})) {
+        if (match({token::TokenType::If})) {
             return if_statement<R>();
         }
 
-        if (match({TokenType::While})) {
+        if (match({token::TokenType::While})) {
             return while_statement<R>();
         }
 
-        if (match({TokenType::For})) {
+        if (match({token::TokenType::For})) {
             return for_statement<R>();
         }
 
@@ -70,15 +72,15 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> var_declaration() {
-        const Token& name {consume(TokenType::Identifier, "Expected a variable name")};
+        const token::Token& name {consume(token::TokenType::Identifier, "Expected a variable name")};
 
         std::shared_ptr<ast::expr::Expr<R>> initializer;
 
-        if (match({TokenType::Equal})) {
+        if (match({token::TokenType::Equal})) {
             initializer = expression<R>();
         }
 
-        consume(TokenType::Semicolon, "Expected `;` after variable declaration");
+        consume(token::TokenType::Semicolon, "Expected `;` after variable declaration");
 
         return std::make_shared<ast::stmt::Let<R>>(name, initializer);
     }
@@ -87,7 +89,7 @@ private:
     std::shared_ptr<ast::stmt::Stmt<R>> expr_statement() {
         std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
 
-        consume(TokenType::Semicolon, "Expected `;` after expression");
+        consume(token::TokenType::Semicolon, "Expected `;` after expression");
 
         return std::make_shared<ast::stmt::Expression<R>>(expr);
     }
@@ -96,23 +98,23 @@ private:
     std::shared_ptr<ast::stmt::Stmt<R>> print_statement() {
         std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
 
-        consume(TokenType::Semicolon, "Expected `;` after expression");
+        consume(token::TokenType::Semicolon, "Expected `;` after expression");
 
         return std::make_shared<ast::stmt::Print<R>>(expr);
     }
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> if_statement() {
-        consume(TokenType::LeftParen, "Expected `(` after `if`");
+        consume(token::TokenType::LeftParen, "Expected `(` after `if`");
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
-        consume(TokenType::RightParen, "Expected `)` after if condition");
+        consume(token::TokenType::RightParen, "Expected `)` after if condition");
 
         std::shared_ptr<ast::stmt::Stmt<R>> then_branch {statement<R>()};
         std::shared_ptr<ast::stmt::Stmt<R>> else_branch;
 
-        if (match({TokenType::Else})) {
+        if (match({token::TokenType::Else})) {
             else_branch = statement<R>();
         }
 
@@ -121,11 +123,11 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> while_statement() {
-        consume(TokenType::LeftParen, "Expected `(` after `while`");
+        consume(token::TokenType::LeftParen, "Expected `(` after `while`");
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
-        consume(TokenType::RightParen, "Expected `)` after while condition");
+        consume(token::TokenType::RightParen, "Expected `)` after while condition");
 
         std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
 
@@ -134,13 +136,13 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> for_statement() {
-        consume(TokenType::LeftParen, "Expected `(` after `for`");
+        consume(token::TokenType::LeftParen, "Expected `(` after `for`");
 
         std::shared_ptr<ast::stmt::Stmt<R>> initializer;
 
-        if (match({TokenType::Semicolon})) {
+        if (match({token::TokenType::Semicolon})) {
             initializer = nullptr;
-        } else if (match({TokenType::Let})) {
+        } else if (match({token::TokenType::Let})) {
             initializer = var_declaration<R>();
         } else {
             initializer = expr_statement<R>();
@@ -148,19 +150,19 @@ private:
 
         std::shared_ptr<ast::expr::Expr<R>> condition;
 
-        if (!check(TokenType::Semicolon)) {
+        if (!check(token::TokenType::Semicolon)) {
             condition = expression<R>();
         }
 
-        consume(TokenType::Semicolon, "Expected `;` after loop condition");
+        consume(token::TokenType::Semicolon, "Expected `;` after loop condition");
 
         std::shared_ptr<ast::expr::Expr<R>> post_expression;
 
-        if (!check(TokenType::RightParen)) {
+        if (!check(token::TokenType::RightParen)) {
             post_expression = expression<R>();
         }
 
-        consume(TokenType::RightParen, "Expected `)` after loop clauses");
+        consume(token::TokenType::RightParen, "Expected `)` after loop clauses");
 
         std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
 
@@ -174,7 +176,7 @@ private:
         }
 
         if (condition == nullptr) {
-            condition = std::make_shared<ast::expr::Literal<R>>(true);
+            condition = std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(true));
         }
 
         body = std::make_shared<ast::stmt::While<R>>(condition, body);
@@ -195,11 +197,11 @@ private:
     std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> block() {
         std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> statements;
 
-        while (!check(TokenType::RightBrace) && !reached_end()) {
+        while (!check(token::TokenType::RightBrace) && !reached_end()) {
             statements.push_back(declaration<R>());
         }
 
-        consume(TokenType::RightBrace, "Excpected `}` after block");
+        consume(token::TokenType::RightBrace, "Excpected `}` after block");
 
         return statements;
     }
@@ -213,8 +215,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> assignment() {
         std::shared_ptr<ast::expr::Expr<R>> expr {logic_or<R>()};
 
-        if (match({TokenType::Equal})) {
-            const Token& equals {previous()};
+        if (match({token::TokenType::Equal})) {
+            const token::Token& equals {previous()};
             std::shared_ptr<ast::expr::Expr<R>> value {assignment<R>()};  // Recursively parse assignments
 
             // Check if left hand side is an l-value
@@ -234,8 +236,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> logic_or() {
         std::shared_ptr<ast::expr::Expr<R>> expr {logic_and<R>()};
 
-        while (match({TokenType::Or})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::Or})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {logic_and<R>()};
             expr = std::make_shared<ast::expr::Logical<R>>(expr, operator_, right);
         }
@@ -247,8 +249,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> logic_and() {
         std::shared_ptr<ast::expr::Expr<R>> expr {equality<R>()};
 
-        while (match({TokenType::And})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::And})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {equality<R>()};
             expr = std::make_shared<ast::expr::Logical<R>>(expr, operator_, right);
         }
@@ -260,8 +262,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> equality() {
         std::shared_ptr<ast::expr::Expr<R>> expr {comparison<R>()};
 
-        while (match({TokenType::BangEqual, TokenType::EqualEqual})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::BangEqual, token::TokenType::EqualEqual})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {comparison<R>()};
             expr = std::make_shared<ast::expr::Binary<R>>(expr, operator_, right);
         }
@@ -273,8 +275,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> comparison() {
         std::shared_ptr<ast::expr::Expr<R>> expr {term<R>()};
 
-        while (match({TokenType::Greater, TokenType::GreaterEqual, TokenType::Less, TokenType::LessEqual})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::Greater, token::TokenType::GreaterEqual, token::TokenType::Less, token::TokenType::LessEqual})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {term<R>()};
             expr = std::make_shared<ast::expr::Binary<R>>(expr, operator_, right);
         }
@@ -286,8 +288,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> term() {
         std::shared_ptr<ast::expr::Expr<R>> expr {factor<R>()};
 
-        while (match({TokenType::Minus, TokenType::Plus})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::Minus, token::TokenType::Plus})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {factor<R>()};
             expr = std::make_shared<ast::expr::Binary<R>>(expr, operator_, right);
         }
@@ -299,8 +301,8 @@ private:
     std::shared_ptr<ast::expr::Expr<R>> factor() {
         std::shared_ptr<ast::expr::Expr<R>> expr {unary<R>()};
 
-        while (match({TokenType::Slash, TokenType::Star})) {
-            const Token& operator_ {previous()};
+        while (match({token::TokenType::Slash, token::TokenType::Star})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {unary<R>()};
             expr = std::make_shared<ast::expr::Binary<R>>(expr, operator_, right);
         }
@@ -310,8 +312,8 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> unary() {
-        if (match({TokenType::Minus, TokenType::Bang})) {
-            const Token& operator_ {previous()};
+        if (match({token::TokenType::Minus, token::TokenType::Bang})) {
+            const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {unary<R>()};
 
             return std::make_shared<ast::expr::Unary<R>>(operator_, right);
@@ -322,29 +324,37 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> primary() {
-        if (match({TokenType::Number, TokenType::String})) {
-            return std::make_shared<ast::expr::Literal<R>>(previous().get_literal());
+        if (match({token::TokenType::Number, token::TokenType::String})) {
+            switch (previous().get_type()) {
+                case token::TokenType::String:
+                    return std::make_shared<ast::expr::Literal<R>>(object::create<object::String>(std::get<1u>(previous().get_literal())));
+                case token::TokenType::Number:
+                    return std::make_shared<ast::expr::Literal<R>>(object::create<object::Number>(std::get<2u>(previous().get_literal())));
+                default:
+                    assert(false);
+                    break;
+            }
         }
 
-        if (match({TokenType::True})) {
-            return std::make_shared<ast::expr::Literal<R>>(true);
+        if (match({token::TokenType::True})) {
+            return std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(true));
         }
 
-        if (match({TokenType::False})) {
-            return std::make_shared<ast::expr::Literal<R>>(false);
+        if (match({token::TokenType::False})) {
+            return std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(false));
         }
 
-        if (match({TokenType::Null})) {
-            return std::make_shared<ast::expr::Literal<R>>(literal::Null());
+        if (match({token::TokenType::None})) {
+            return std::make_shared<ast::expr::Literal<R>>(object::create<object::None>());
         }
 
-        if (match({TokenType::Identifier})) {
+        if (match({token::TokenType::Identifier})) {
             return std::make_shared<ast::expr::Variable<R>>(previous());
         }
 
-        if (match({TokenType::LeftParen})) {
+        if (match({token::TokenType::LeftParen})) {
             std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
-            consume(TokenType::RightParen, "Expected `)` after expression");
+            consume(token::TokenType::RightParen, "Expected `)` after expression");
 
             return std::make_shared<ast::expr::Grouping<R>>(expr);
         }
@@ -352,17 +362,17 @@ private:
         throw error(peek(), "Expected an expression");
     }
 
-    bool match(std::initializer_list<TokenType> types);
-    bool check(TokenType type);
-    const Token& advance();
+    bool match(std::initializer_list<token::TokenType> types);
+    bool check(token::TokenType type);
+    const token::Token& advance();
     bool reached_end();
-    const Token& peek();
-    const Token& previous();
-    const Token& consume(TokenType type, const std::string& message);
-    ParseError error(const Token& token, const std::string& message);
+    const token::Token& peek();
+    const token::Token& previous();
+    const token::Token& consume(token::TokenType type, const std::string& message);
+    ParseError error(const token::Token& token, const std::string& message);
     void synchronize();
 
-    std::vector<Token> tokens;
+    std::vector<token::Token> tokens;
     std::size_t current {};
 
     Context* ctx {nullptr};
