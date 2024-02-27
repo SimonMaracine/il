@@ -2,7 +2,10 @@
 
 #include <string>
 #include <memory>
-#include <utility>
+#include <vector>
+#include <cstddef>
+
+class Interpreter;
 
 namespace object {
     enum class Type {
@@ -30,6 +33,13 @@ namespace object {
 
     struct Boolean : Object {
         bool value {};
+    };
+
+    struct Callable {
+        virtual ~Callable() noexcept = default;
+
+        virtual std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) = 0;
+        virtual std::size_t arity() = 0;
     };
 
     inline std::shared_ptr<Object> create() {
@@ -66,5 +76,10 @@ namespace object {
     template<typename T>
     std::shared_ptr<T> cast(const std::shared_ptr<Object>& object) {
         return std::static_pointer_cast<T>(object);
+    }
+
+    template<typename T>
+    std::shared_ptr<T> try_cast(const std::shared_ptr<Object>& object) {
+        return std::dynamic_pointer_cast<T>(object);
     }
 }

@@ -135,6 +135,31 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
     return object::create(object::cast<object::Boolean>(right)->value);
 }
 
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> callee {evaluate(expr->callee)};
+
+    std::vector<std::shared_ptr<object::Object>> arguments;
+
+    for (const std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>>& argument : expr->arguments) {
+        arguments.push_back(evaluate(argument));
+    }
+
+    std::shared_ptr<object::Callable> function {object::try_cast<object::Callable>(callee)};
+
+    if (!function) {
+        throw RuntimeError(expr->paren, "Only functions and classes are callable");
+    }
+
+    if (arguments.size() != function->arity()) {
+        throw RuntimeError(
+            expr->paren,
+            "Expected `" + std::to_string(function->arity()) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
+        );
+    }
+
+    return function->call(this, arguments);
+}
+
 std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr) {
     return expr->accept(this);
 }
@@ -186,7 +211,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
     std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
-    check_boolean_value(stmt->open, value);
+    check_boolean_value(stmt->paren, value);
 
     if (object::cast<object::Boolean>(value)->value) {
         execute(stmt->then_branch);
@@ -203,7 +228,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::s
     while (true) {
         std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
-        check_boolean_value(stmt->open, value);
+        check_boolean_value(stmt->paren, value);
 
         if (!object::cast<object::Boolean>(value)->value) {
             break;

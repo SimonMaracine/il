@@ -105,7 +105,7 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> if_statement() {
-        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `if`")};
+        const token::Token& paren {consume(token::TokenType::LeftParen, "Expected `(` after `if`")};
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
@@ -118,12 +118,12 @@ private:
             else_branch = statement<R>();
         }
 
-        return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch, open);
+        return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch, paren);
     }
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> while_statement() {
-        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `while`")};
+        const token::Token& paren {consume(token::TokenType::LeftParen, "Expected `(` after `while`")};
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
@@ -131,12 +131,12 @@ private:
 
         std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
 
-        return std::make_shared<ast::stmt::While<R>>(condition, body, open);
+        return std::make_shared<ast::stmt::While<R>>(condition, body, paren);
     }
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> for_statement() {
-        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `for`")};
+        const token::Token& paren {consume(token::TokenType::LeftParen, "Expected `(` after `for`")};
 
         std::shared_ptr<ast::stmt::Stmt<R>> initializer;
 
@@ -179,7 +179,7 @@ private:
             condition = std::make_shared<ast::expr::Literal<R>>(object::create(true));
         }
 
-        body = std::make_shared<ast::stmt::While<R>>(condition, body, open);
+        body = std::make_shared<ast::stmt::While<R>>(condition, body, paren);
 
         if (initializer != nullptr) {
             body = std::make_shared<ast::stmt::Block<R>>(
@@ -319,7 +319,22 @@ private:
             return std::make_shared<ast::expr::Unary<R>>(operator_, right);
         }
 
-        return primary<R>();
+        return call<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::expr::Expr<R>> call() {
+        std::shared_ptr<ast::expr::Expr<R>> expr {primary<R>()};
+
+        while (true) {
+            if (match({token::TokenType::LeftParen})) {
+                expr = finish_call<R>(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
     }
 
     template<typename R>
@@ -360,6 +375,25 @@ private:
         }
 
         throw error(peek(), "Expected an expression");
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::expr::Expr<R>> finish_call(std::shared_ptr<ast::expr::Expr<R>> callee) {
+        std::vector<std::shared_ptr<ast::expr::Expr<R>>> arguments;
+
+        if (!check(token::TokenType::RightParen)) {
+            do {
+                if (arguments.size() >= 255) {
+                    error(peek(), "Too many arguments (255 maximum)");  // Don't go in panic mode
+                }
+
+                arguments.push_back(expression<R>());
+            } while (match({token::TokenType::Comma}));
+        }
+
+        const token::Token& paren {consume(token::TokenType::RightParen, "Expected `)` after call arguments")};
+
+        return std::make_shared<ast::expr::Call<R>>(callee, paren, arguments);
     }
 
     bool match(std::initializer_list<token::TokenType> types);

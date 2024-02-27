@@ -33,6 +33,9 @@ namespace ast {
         struct Logical;
 
         template<typename R>
+        struct Call;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(Literal<R>* expr) = 0;
             virtual R visit(Grouping<R>* expr) = 0;
@@ -41,6 +44,7 @@ namespace ast {
             virtual R visit(Variable<R>* expr) = 0;
             virtual R visit(Assignment<R>* expr) = 0;
             virtual R visit(Logical<R>* expr) = 0;
+            virtual R visit(Call<R>* expr) = 0;
         };
 
         template<typename R>
@@ -139,6 +143,20 @@ namespace ast {
             token::Token operator_;
             std::shared_ptr<Expr<R>> right;
         };
+
+        template<typename R>
+        struct Call : Expr<R> {
+            Call(std::shared_ptr<Expr<R>> callee, const token::Token& paren, const std::vector<std::shared_ptr<Expr<R>>>& arguments)
+                : callee(callee), paren(paren), arguments(arguments) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> callee;
+            token::Token paren;
+            std::vector<std::shared_ptr<Expr<R>>> arguments;
+        };
     }
 
     namespace stmt {
@@ -218,8 +236,8 @@ namespace ast {
 
         template<typename R>
         struct If : Stmt<R> {
-            If(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> then_branch, std::shared_ptr<Stmt<R>> else_branch, const token::Token& open)
-                : condition(condition), then_branch(then_branch), else_branch(else_branch), open(open) {}
+            If(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> then_branch, std::shared_ptr<Stmt<R>> else_branch, const token::Token& paren)
+                : condition(condition), then_branch(then_branch), else_branch(else_branch), paren(paren) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
@@ -228,13 +246,13 @@ namespace ast {
             std::shared_ptr<Expr<R>> condition;
             std::shared_ptr<Stmt<R>> then_branch;
             std::shared_ptr<Stmt<R>> else_branch;
-            token::Token open;
+            token::Token paren;
         };
 
         template<typename R>
         struct While : Stmt<R> {
-            While(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> body, const token::Token& open)
-                : condition(condition), body(body), open(open) {}
+            While(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> body, const token::Token& paren)
+                : condition(condition), body(body), paren(paren) {}
 
             R accept(Visitor<R>* visitor) override {
                 return visitor->visit(this);
@@ -242,7 +260,7 @@ namespace ast {
 
             std::shared_ptr<Expr<R>> condition;
             std::shared_ptr<Stmt<R>> body;
-            token::Token open;
+            token::Token paren;
         };
 
         template<typename R>
