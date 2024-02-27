@@ -1,3 +1,3 @@
 let name = "Alice";
-print "My name is " + name + ".";
+println("My name is " + name + ".");
 // :)

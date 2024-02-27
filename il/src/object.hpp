@@ -41,7 +41,7 @@ namespace object {
         using Call = std::function<std::shared_ptr<Object>(Interpreter*, const std::vector<std::shared_ptr<Object>>&)>;
 
         Call call;
-        std::size_t arity;
+        std::size_t arity {};
     };
 
     inline std::shared_ptr<Object> create() {

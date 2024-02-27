@@ -10,6 +10,7 @@ Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
     global_environment.define("clock", object::create(builtins::clock, 0u));
     global_environment.define("print", object::create(builtins::print, 1u));
+    global_environment.define("println", object::create(builtins::println, 1u));
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -45,7 +46,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_
     }
 
     assert(false);
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared_ptr<object::Object>>* expr) {
@@ -95,7 +96,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
     }
 
     assert(false);
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Variable<std::shared_ptr<object::Object>>* expr) {
@@ -173,7 +174,7 @@ std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr:
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) {
     evaluate(stmt->expression);
 
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) {
@@ -187,7 +188,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
 
     current_environment->define(stmt->name.get_lexeme(), value);
 
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
@@ -203,7 +204,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shar
         }
     }
 
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) {
@@ -219,13 +220,13 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::s
         execute(stmt->body);
     }
 
-    return {};
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) {
     execute_block(stmt->statements, Environment(current_environment));
 
-    return {};
+    return nullptr;
 }
 
 void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement) {

@@ -1,30 +1,30 @@
 // This is ignored
 
-print 2 + 2;
+println(2 + 2);
 
-print 4 + 2 / 2;
+println(4 + 2 / 2);
 
-print 90 * (1 - 3);
+println(90 * (1 - 3));
 
-print true;
+println(true);
 
-print false;
+println(false);
 
-print null;
+println(none);
 
-let x;  // Value is null
+let x;  // Value is none
 
-print x;
+println(x);
 
 let name = "Simon";
-print name;
-print "Hello, " + name + "!";
+println(name);
+println("Hello, " + name + "!");
 
 let x = 1;  // Shadows previous x
-print x;
+println(x);
 
 x = 10;
-print x;
+println(x);
 
 x = x + 1;
-print x;
+println(x);

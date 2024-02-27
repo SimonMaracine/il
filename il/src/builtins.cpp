@@ -16,19 +16,19 @@ namespace builtins {
 
         switch (value->type) {
             case object::Type::None:
-                std::cout << "none" << '\n';
+                std::cout << "none";
                 break;
             case object::Type::String:
-                std::cout << object::cast<object::String>(value)->value << '\n';
+                std::cout << object::cast<object::String>(value)->value;
                 break;
             case object::Type::Number:
-                std::cout << object::cast<object::Number>(value)->value << '\n';
+                std::cout << object::cast<object::Number>(value)->value;
                 break;
             case object::Type::Boolean:
-                std::cout << std::boolalpha << object::cast<object::Boolean>(value)->value << '\n';
+                std::cout << std::boolalpha << object::cast<object::Boolean>(value)->value;
                 break;
             case object::Type::Function:
-                std::cout << "<builtin function>" << '\n';
+                std::cout << "<builtin function>";
                 break;
             default:
                 assert(false);
@@ -36,5 +36,13 @@ namespace builtins {
         }
 
         return object::create();
+    }
+
+    std::shared_ptr<object::Object> println(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+        const auto result {print(interpreter, arguments)};
+
+        std::cout << std::endl;
+
+        return result;
     }
 }
