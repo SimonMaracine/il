@@ -3,8 +3,6 @@
 #include "object.hpp"
 
 namespace builtins {
-    struct clock : object::Object, object::Callable {
-        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) override;
-        std::size_t arity() const override;
-    };
+    std::shared_ptr<object::Object> clock(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&);
+    std::shared_ptr<object::Object> print(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments);
 }

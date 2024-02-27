@@ -1,7 +1,6 @@
 #include "interpreter.hpp"
 
 #include <cassert>
-#include <iostream>
 #include <utility>
 
 #include "runtime_error.hpp"
@@ -9,7 +8,8 @@
 
 Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
-    global_environment.define("clock", std::make_shared<builtins::clock>());
+    global_environment.define("clock", object::create(builtins::clock, 0u));
+    global_environment.define("print", object::create(builtins::print, 1u));
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -150,16 +150,16 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         arguments.push_back(evaluate(argument));
     }
 
-    std::shared_ptr<object::Callable> function {object::try_cast<object::Callable>(callee)};
-
-    if (!function) {
+    if (callee->type != object::Type::Function) {
         throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
 
-    if (arguments.size() != function->arity()) {
+    std::shared_ptr<object::Function> function {object::cast<object::Function>(callee)};
+
+    if (arguments.size() != function->arity) {
         throw RuntimeError(
             expr->paren,
-            "Expected `" + std::to_string(function->arity()) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
+            "Expected `" + std::to_string(function->arity) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
         );
     }
 
@@ -172,30 +172,6 @@ std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr:
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) {
     evaluate(stmt->expression);
-
-    return {};
-}
-
-std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Print<std::shared_ptr<object::Object>>* stmt) {
-    std::shared_ptr<object::Object> value {evaluate(stmt->expression)};
-
-    switch (value->type) {
-        case object::Type::None:
-            std::cout << "none" << '\n';
-            break;
-        case object::Type::String:
-            std::cout << object::cast<object::String>(value)->value << '\n';
-            break;
-        case object::Type::Number:
-            std::cout << object::cast<object::Number>(value)->value << '\n';
-            break;
-        case object::Type::Boolean:
-            std::cout << std::boolalpha << object::cast<object::Boolean>(value)->value << '\n';
-            break;
-        default:
-            assert(false);
-            break;
-    }
 
     return {};
 }

@@ -33,7 +33,7 @@ namespace token {
         Let, True, False, None, Or, And, If, Else, While, For,
 
         // Other
-        Bang, Equal, Print,
+        Bang, Equal,
 
         TokenCount
     };
@@ -86,7 +86,7 @@ namespace token {
 
         "Let"sv, "True"sv, "False"sv, "None"sv, "Or"sv, "And"sv, "If"sv, "Else"sv, "While"sv, "For"sv,
 
-        "Bang"sv, "Equal"sv, "Print"sv
+        "Bang"sv, "Equal"sv
     };
 
     static_assert(std::size(TOKEN_NAMES) == static_cast<std::size_t>(TokenType::TokenCount));

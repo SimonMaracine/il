@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <cstddef>
+#include <functional>
 
 class Interpreter;
 
@@ -12,7 +13,8 @@ namespace object {
         None,
         String,
         Number,
-        Boolean
+        Boolean,
+        Function
     };
 
     struct Object {
@@ -35,11 +37,11 @@ namespace object {
         bool value {};
     };
 
-    struct Callable {
-        virtual ~Callable() noexcept = default;
+    struct Function : Object {
+        using Call = std::function<std::shared_ptr<Object>(Interpreter*, const std::vector<std::shared_ptr<Object>>&)>;
 
-        virtual std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) = 0;
-        virtual std::size_t arity() const = 0;
+        Call call;
+        std::size_t arity;
     };
 
     inline std::shared_ptr<Object> create() {
@@ -73,13 +75,17 @@ namespace object {
         return object;
     }
 
-    template<typename T>
-    std::shared_ptr<T> cast(const std::shared_ptr<Object>& object) {
-        return std::static_pointer_cast<T>(object);
+    inline std::shared_ptr<Object> create(const Function::Call& call, std::size_t arity) {
+        std::shared_ptr<Function> object {std::make_shared<Function>()};
+        object->type = Type::Function;
+        object->call = call;
+        object->arity = arity;
+
+        return object;
     }
 
     template<typename T>
-    std::shared_ptr<T> try_cast(const std::shared_ptr<Object>& object) {
-        return std::dynamic_pointer_cast<T>(object);
+    std::shared_ptr<T> cast(const std::shared_ptr<Object>& object) {
+        return std::static_pointer_cast<T>(object);
     }
 }

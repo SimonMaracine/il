@@ -2,13 +2,11 @@ program         : statement* EOF ;
 
 declaration     : var_declaration | statement ;
 
-statement       : expr_statement | print_statement | block | if_statement | while_statement | for_statement ;
+statement       : expr_statement | block | if_statement | while_statement | for_statement ;
 
 var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
 
 expr_statement  : expression ";" ;
-
-print_statement : "print" expression ";" ;
 
 if_statement    : "if" "(" expression ")" statement ( "else" statement )* ;
 

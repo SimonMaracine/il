@@ -47,10 +47,6 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> statement() {
-        if (match({token::TokenType::Print})) {
-            return print_statement<R>();
-        }
-
         if (match({token::TokenType::LeftBrace})) {
             return std::make_shared<ast::stmt::Block<R>>(block<R>());
         }
@@ -92,15 +88,6 @@ private:
         consume(token::TokenType::Semicolon, "Expected `;` after expression");
 
         return std::make_shared<ast::stmt::Expression<R>>(expr);
-    }
-
-    template<typename R>
-    std::shared_ptr<ast::stmt::Stmt<R>> print_statement() {
-        std::shared_ptr<ast::expr::Expr<R>> expr {expression<R>()};
-
-        consume(token::TokenType::Semicolon, "Expected `;` after expression");
-
-        return std::make_shared<ast::stmt::Print<R>>(expr);
     }
 
     template<typename R>

@@ -166,9 +166,6 @@ namespace ast {
         struct Expression;
 
         template<typename R>
-        struct Print;
-
-        template<typename R>
         struct Let;
 
         template<typename R>
@@ -183,7 +180,6 @@ namespace ast {
         template<typename R>
         struct Visitor {
             virtual R visit(const Expression<R>* stmt) = 0;
-            virtual R visit(const Print<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
             virtual R visit(const If<R>* stmt) = 0;
             virtual R visit(const While<R>* stmt) = 0;
@@ -200,18 +196,6 @@ namespace ast {
         template<typename R>
         struct Expression : Stmt<R> {
             Expression(std::shared_ptr<Expr<R>> expression)
-                : expression(expression) {}
-
-            R accept(Visitor<R>* visitor) override {
-                return visitor->visit(this);
-            }
-
-            std::shared_ptr<Expr<R>> expression;
-        };
-
-        template<typename R>
-        struct Print : Stmt<R> {
-            Print(std::shared_ptr<Expr<R>> expression)
                 : expression(expression) {}
 
             R accept(Visitor<R>* visitor) override {
