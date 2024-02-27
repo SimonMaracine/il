@@ -1,17 +1,12 @@
-#include <iostream>
-#include <cstdlib>
-
 #include "il.hpp"
 
 int main(int argc, char** argv) {
     Il interpreter;
 
-    if (argc > 2) {
-        std::cout << "Invalid arguments\n";
-        std::exit(1);
-    } else if (argc == 2) {
-        interpreter.run_file(argv[1u]);
+    if (argc == 1) {
+        return interpreter.run_repl();
     } else {
-        interpreter.run_repl();
+        // TODO the other arguments should be picked up by the script
+        return interpreter.run_file(argv[1u]);
     }
 }

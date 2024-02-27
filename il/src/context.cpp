@@ -15,11 +15,11 @@ void Context::error(std::size_t line, const std::string& message) {
 }
 
 void Context::runtime_error(const token::Token& token, const std::string& message) {
-    std::cout << message + "\n[line " + std::to_string(token.get_line()) + "]\n";
+    std::cerr << message + "\n[line " + std::to_string(token.get_line()) + "]\n";
     had_runtime_error = true;
 }
 
 void Context::report(std::size_t line, const std::string& where, const std::string& message) {
-    std::cout << "[line " << line << "] Error" << where << ": " << message << '\n';
+    std::cerr << "[line " << line << "] Error" << where << ": " << message << '\n';
     had_error = true;
 }

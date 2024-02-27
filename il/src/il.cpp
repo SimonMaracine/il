@@ -10,29 +10,28 @@
 #include "object.hpp"
 #include "ast_printer.hpp"  // TODO temporary
 
-void Il::run_file(const std::string& file_path) {
+int Il::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
 
     if (!contents) {
-        // FIXME error
-        std::cout << "Error reading file\n";
-        return;
+        std::cerr << "il: could not read file `" + file_path + "`\n";
+        return 1;
     }
 
     run(*contents);
 
     if (ctx.had_error) {
-        // FIXME error
-        return;
+        return 1;
     }
 
     if (ctx.had_runtime_error) {
-        // FIXME error
-        return;
+        return 1;
     }
+
+    return 0;
 }
 
-void Il::run_repl() {
+int Il::run_repl() {
     while (true) {
         std::cout << "il> ";
 
@@ -57,6 +56,8 @@ void Il::run_repl() {
 
         ctx.had_error = false;
     }
+
+    return 0;
 }
 
 void Il::run(const std::string& source_code) {
