@@ -11,6 +11,7 @@ Interpreter::Interpreter(Context* ctx)
     global_environment.define("clock", object::create(builtins::clock, 0u));
     global_environment.define("print", object::create(builtins::print, 1u));
     global_environment.define("println", object::create(builtins::println, 1u));
+    global_environment.define("to_string", object::create(builtins::to_string, 1u));
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -37,9 +38,11 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
             check_number_operand(expr->operator_, right);
+
             return object::create(-object::cast<object::Number>(right)->value);
         case token::TokenType::Bang:
             check_boolean_operand(expr->operator_, right);
+
             return object::create(!object::cast<object::Boolean>(right)->value);
         default:
             break;
@@ -56,41 +59,72 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value - object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value - object::cast<object::Number>(right)->value
+            );
         case token::TokenType::Plus:
             if (left->type == object::Type::Number && right->type == object::Type::Number) {
-                return object::create(object::cast<object::Number>(left)->value + object::cast<object::Number>(right)->value);
+                return object::create(
+                    object::cast<object::Number>(left)->value + object::cast<object::Number>(right)->value
+                );
             }
 
             if (left->type == object::Type::String && right->type == object::Type::String) {
-                return object::create(object::cast<object::String>(left)->value + object::cast<object::String>(right)->value);
+                return object::create(
+                    object::cast<object::String>(left)->value + object::cast<object::String>(right)->value
+                );
             }
 
             throw RuntimeError(expr->operator_, "Operands must be either numbers or strings");
         case token::TokenType::Slash:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value / object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value / object::cast<object::Number>(right)->value
+            );
         case token::TokenType::Star:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value * object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value * object::cast<object::Number>(right)->value
+            );
         case token::TokenType::Greater:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value > object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value > object::cast<object::Number>(right)->value
+            );
         case token::TokenType::GreaterEqual:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value >= object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value >= object::cast<object::Number>(right)->value
+            );
         case token::TokenType::Less:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value < object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value < object::cast<object::Number>(right)->value
+            );
         case token::TokenType::LessEqual:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value <= object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value <= object::cast<object::Number>(right)->value
+            );
         case token::TokenType::BangEqual:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value != object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value != object::cast<object::Number>(right)->value
+            );
         case token::TokenType::EqualEqual:
             check_number_operands(expr->operator_, left, right);
-            return object::create(object::cast<object::Number>(left)->value == object::cast<object::Number>(right)->value);
+
+            return object::create(
+                object::cast<object::Number>(left)->value == object::cast<object::Number>(right)->value
+            );
         default:
             break;
     }
