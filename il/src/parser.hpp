@@ -176,7 +176,7 @@ private:
         }
 
         if (condition == nullptr) {
-            condition = std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(true));
+            condition = std::make_shared<ast::expr::Literal<R>>(object::create(true));
         }
 
         body = std::make_shared<ast::stmt::While<R>>(condition, body);
@@ -327,9 +327,9 @@ private:
         if (match({token::TokenType::Number, token::TokenType::String})) {
             switch (previous().get_type()) {
                 case token::TokenType::String:
-                    return std::make_shared<ast::expr::Literal<R>>(object::create<object::String>(std::get<1u>(previous().get_literal())));
+                    return std::make_shared<ast::expr::Literal<R>>(object::create(std::get<1u>(previous().get_literal())));
                 case token::TokenType::Number:
-                    return std::make_shared<ast::expr::Literal<R>>(object::create<object::Number>(std::get<2u>(previous().get_literal())));
+                    return std::make_shared<ast::expr::Literal<R>>(object::create(std::get<2u>(previous().get_literal())));
                 default:
                     assert(false);
                     break;
@@ -337,15 +337,15 @@ private:
         }
 
         if (match({token::TokenType::True})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(true));
+            return std::make_shared<ast::expr::Literal<R>>(object::create(true));
         }
 
         if (match({token::TokenType::False})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create<object::Boolean>(false));
+            return std::make_shared<ast::expr::Literal<R>>(object::create(false));
         }
 
         if (match({token::TokenType::None})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create<object::None>());
+            return std::make_shared<ast::expr::Literal<R>>(object::create());
         }
 
         if (match({token::TokenType::Identifier})) {

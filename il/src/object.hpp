@@ -32,21 +32,14 @@ namespace object {
         bool value {};
     };
 
-    template<typename T, typename... Args>
-    std::shared_ptr<Object> create(Args&&...) {
-        return nullptr;
-    }
-
-    template<>
-    inline std::shared_ptr<Object> create<None>() {
+    inline std::shared_ptr<Object> create() {
         std::shared_ptr<None> object {std::make_shared<None>()};
         object->type = Type::None;
 
         return object;
     }
 
-    template<>
-    inline std::shared_ptr<Object> create<String>(const std::string& value) {
+    inline std::shared_ptr<Object> create(const std::string& value) {
         std::shared_ptr<String> object {std::make_shared<String>()};
         object->type = Type::String;
         object->value = value;
@@ -54,8 +47,7 @@ namespace object {
         return object;
     }
 
-    template<>
-    inline std::shared_ptr<Object> create<Number>(double&& value) {
+    inline std::shared_ptr<Object> create(double value) {
         std::shared_ptr<Number> object {std::make_shared<Number>()};
         object->type = Type::Number;
         object->value = value;
@@ -63,8 +55,7 @@ namespace object {
         return object;
     }
 
-    template<>
-    inline std::shared_ptr<Object> create<Boolean>(bool&& value) {
+    inline std::shared_ptr<Object> create(bool value) {
         std::shared_ptr<Boolean> object {std::make_shared<Boolean>()};
         object->type = Type::Boolean;
         object->value = value;
