@@ -30,11 +30,9 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
             check_number_operand(expr->operator_, right);
-            // return -std::get<2u>(right);
             return object::create(-object::cast<object::Number>(right)->value);
         case token::TokenType::Bang:
             check_boolean_operand(expr->operator_, right);
-            // return !std::get<3u>(right);
             return object::create(!object::cast<object::Boolean>(right)->value);
         default:
             break;
@@ -51,51 +49,40 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) - std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value - object::cast<object::Number>(right)->value);
         case token::TokenType::Plus:
             if (left->type == object::Type::Number && right->type == object::Type::Number) {
-                // return std::get<2u>(left) + std::get<2u>(right);
                 return object::create(object::cast<object::Number>(left)->value + object::cast<object::Number>(right)->value);
             }
 
             if (left->type == object::Type::String && right->type == object::Type::String) {
-                // return std::get<1u>(left) + std::get<1u>(right);
                 return object::create(object::cast<object::String>(left)->value + object::cast<object::String>(right)->value);
             }
 
             throw RuntimeError(expr->operator_, "Operands must be either numbers or strings");
         case token::TokenType::Slash:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) / std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value / object::cast<object::Number>(right)->value);
         case token::TokenType::Star:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) * std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value * object::cast<object::Number>(right)->value);
         case token::TokenType::Greater:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) > std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value > object::cast<object::Number>(right)->value);
         case token::TokenType::GreaterEqual:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) >= std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value >= object::cast<object::Number>(right)->value);
         case token::TokenType::Less:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) < std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value < object::cast<object::Number>(right)->value);
         case token::TokenType::LessEqual:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) <= std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value <= object::cast<object::Number>(right)->value);
         case token::TokenType::BangEqual:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) != std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value != object::cast<object::Number>(right)->value);
         case token::TokenType::EqualEqual:
             check_number_operands(expr->operator_, left, right);
-            // return std::get<2u>(left) == std::get<2u>(right);
             return object::create(object::cast<object::Number>(left)->value == object::cast<object::Number>(right)->value);
         default:
             break;
@@ -122,19 +109,17 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
 
     switch (expr->operator_.get_type()) {
         case token::TokenType::Or:
-            // check_boolean_value(, value);  // FIXME
+            check_boolean_value(expr->operator_, left);
 
             if (object::cast<object::Boolean>(left)->value) {
-                // return true;
                 return object::create(true);
             }
 
             break;
         case token::TokenType::And:
-            // check_boolean_value(, value);  // FIXME
+            check_boolean_value(expr->operator_, left);
 
             if (!object::cast<object::Boolean>(left)->value) {
-                // return false;
                 return object::create(false);
             }
 
@@ -145,7 +130,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
 
     std::shared_ptr<object::Object> right {evaluate(expr->right)};
 
-    // check_boolean_value(, value);  // FIXME
+    check_boolean_value(expr->operator_, right);
 
     return object::create(object::cast<object::Boolean>(right)->value);
 }
@@ -174,7 +159,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Print<std::s
             std::cout << object::cast<object::Number>(value)->value << '\n';
             break;
         case object::Type::Boolean:
-            std::cout << (object::cast<object::Boolean>(value)->value ? "true" : "false") << '\n';
+            std::cout << std::boolalpha << object::cast<object::Boolean>(value)->value << '\n';
             break;
         default:
             assert(false);
@@ -201,7 +186,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
     std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
-    // check_boolean_value(, value);  // FIXME
+    check_boolean_value(stmt->open, value);
 
     if (object::cast<object::Boolean>(value)->value) {
         execute(stmt->then_branch);
@@ -218,7 +203,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::s
     while (true) {
         std::shared_ptr<object::Object> value {evaluate(stmt->condition)};
 
-        // check_boolean_value(, value);  // FIXME
+        check_boolean_value(stmt->open, value);
 
         if (!object::cast<object::Boolean>(value)->value) {
             break;

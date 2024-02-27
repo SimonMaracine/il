@@ -105,7 +105,7 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> if_statement() {
-        consume(token::TokenType::LeftParen, "Expected `(` after `if`");
+        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `if`")};
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
@@ -118,12 +118,12 @@ private:
             else_branch = statement<R>();
         }
 
-        return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch);
+        return std::make_shared<ast::stmt::If<R>>(condition, then_branch, else_branch, open);
     }
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> while_statement() {
-        consume(token::TokenType::LeftParen, "Expected `(` after `while`");
+        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `while`")};
 
         std::shared_ptr<ast::expr::Expr<R>> condition {expression<R>()};
 
@@ -131,12 +131,12 @@ private:
 
         std::shared_ptr<ast::stmt::Stmt<R>> body {statement<R>()};
 
-        return std::make_shared<ast::stmt::While<R>>(condition, body);
+        return std::make_shared<ast::stmt::While<R>>(condition, body, open);
     }
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> for_statement() {
-        consume(token::TokenType::LeftParen, "Expected `(` after `for`");
+        const token::Token& open {consume(token::TokenType::LeftParen, "Expected `(` after `for`")};
 
         std::shared_ptr<ast::stmt::Stmt<R>> initializer;
 
@@ -179,7 +179,7 @@ private:
             condition = std::make_shared<ast::expr::Literal<R>>(object::create(true));
         }
 
-        body = std::make_shared<ast::stmt::While<R>>(condition, body);
+        body = std::make_shared<ast::stmt::While<R>>(condition, body, open);
 
         if (initializer != nullptr) {
             body = std::make_shared<ast::stmt::Block<R>>(
