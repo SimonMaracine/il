@@ -39,7 +39,7 @@ namespace object {
         virtual ~Callable() noexcept = default;
 
         virtual std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) = 0;
-        virtual std::size_t arity() = 0;
+        virtual std::size_t arity() const = 0;
     };
 
     inline std::shared_ptr<Object> create() {

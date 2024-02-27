@@ -11,8 +11,7 @@
 
 class Interpreter : ast::expr::Visitor<std::shared_ptr<object::Object>>, ast::stmt::Visitor<std::shared_ptr<object::Object>> {
 public:
-    Interpreter(Context* ctx)
-        : current_environment(&global_environment), ctx(ctx) {}
+    Interpreter(Context* ctx);
 
     void interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements);
 private:

@@ -4,6 +4,8 @@ add_executable(il
     "src/ast_printer.cpp"
     "src/ast_printer.hpp"
     "src/ast.hpp"
+    "src/builtins.cpp"
+    "src/builtins.hpp"
     "src/context.cpp"
     "src/context.hpp"
     "src/environment.cpp"

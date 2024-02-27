@@ -5,6 +5,12 @@
 #include <utility>
 
 #include "runtime_error.hpp"
+#include "builtins.hpp"
+
+Interpreter::Interpreter(Context* ctx)
+    : current_environment(&global_environment), ctx(ctx) {
+    global_environment.define("clock", std::make_shared<builtins::clock>());
+}
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
     try {
