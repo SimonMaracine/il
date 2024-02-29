@@ -8,10 +8,10 @@
 
 Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
-    global_environment.define("clock", object::create(builtins::clock, 0u));
-    global_environment.define("print", object::create(builtins::print, 1u));
-    global_environment.define("println", object::create(builtins::println, 1u));
-    global_environment.define("to_string", object::create(builtins::to_string, 1u));
+    global_environment.define("clock", object::create_builtin<builtins::clock>());
+    global_environment.define("print", object::create_builtin<builtins::print>());
+    global_environment.define("println", object::create_builtin<builtins::println>());
+    global_environment.define("to_string", object::create_builtin<builtins::to_string>());
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -185,16 +185,23 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         arguments.push_back(evaluate(argument));
     }
 
-    if (callee->type != object::Type::Function) {
-        throw RuntimeError(expr->paren, "Only functions and classes are callable");
+    std::shared_ptr<object::Callable> function;
+
+    switch (callee->type) {
+        case object::Type::BuiltinFunction:
+            function = object::cast<object::BuiltinFunction>(callee);
+            break;
+        case object::Type::Function:
+            function = object::cast<object::Function>(callee);
+            break;
+        default:
+            throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
 
-    std::shared_ptr<object::BuiltinFunction> function {object::cast<object::BuiltinFunction>(callee)};
-
-    if (arguments.size() != function->arity) {
+    if (arguments.size() != function->arity()) {
         throw RuntimeError(
             expr->paren,
-            "Expected `" + std::to_string(function->arity) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
+            "Expected `" + std::to_string(function->arity()) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
         );
     }
 

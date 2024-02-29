@@ -18,6 +18,10 @@ namespace object {
         return create();
     }
 
+    std::size_t Function::arity() const {
+        return declaration->parameters.size();
+    }
+
     std::shared_ptr<Object> create() {
         std::shared_ptr<None> object {std::make_shared<None>()};
         object->type = Type::None;
@@ -49,20 +53,10 @@ namespace object {
         return object;
     }
 
-    std::shared_ptr<Object> create(const BuiltinFunction::Call& call, std::size_t arity) {
-        std::shared_ptr<BuiltinFunction> object {std::make_shared<BuiltinFunction>()};
-        object->type = Type::BuiltinFunction;
-        object->call = call;
-        object->arity = arity;
-
-        return object;
-    }
-
     std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<std::shared_ptr<Object>>> declaration) {
         std::shared_ptr<Function> object {std::make_shared<Function>()};
         object->type = Type::Function;
         object->declaration = declaration;
-        object->arity = declaration->parameters.size();
 
         return object;
     }

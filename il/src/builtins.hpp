@@ -3,8 +3,23 @@
 #include "object.hpp"
 
 namespace builtins {
-    std::shared_ptr<object::Object> clock(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&);
-    std::shared_ptr<object::Object> print(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments);
-    std::shared_ptr<object::Object> println(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments);
-    std::shared_ptr<object::Object> to_string(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments);
+    struct clock : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) override;
+        std::size_t arity() const override;
+    };
+
+    struct print : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::size_t arity() const override;
+    };
+
+    struct println : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::size_t arity() const override;
+    };
+
+    struct to_string : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::size_t arity() const override;
+    };
 }

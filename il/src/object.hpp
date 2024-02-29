@@ -31,6 +31,13 @@ namespace object {
         Type type {};
     };
 
+    struct Callable {
+        virtual ~Callable() noexcept = default;
+
+        virtual std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) = 0;
+        virtual std::size_t arity() const = 0;
+    };
+
     struct None : Object {};
 
     struct String : Object {
@@ -45,26 +52,28 @@ namespace object {
         bool value {};
     };
 
-    struct BuiltinFunction : Object {
-        using Call = std::function<std::shared_ptr<Object>(Interpreter*, const std::vector<std::shared_ptr<Object>>&)>;
+    struct BuiltinFunction : Object, Callable {};
 
-        Call call;
-        std::size_t arity {};
-    };
-
-    struct Function : Object {
-        std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments);
+    struct Function : Object, Callable {
+        std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
+        std::size_t arity() const override;
 
         std::shared_ptr<ast::stmt::Function<std::shared_ptr<Object>>> declaration;
-        std::size_t arity {};
     };
 
     std::shared_ptr<Object> create();
     std::shared_ptr<Object> create(const std::string& value);
     std::shared_ptr<Object> create(double value);
     std::shared_ptr<Object> create(bool value);
-    std::shared_ptr<Object> create(const BuiltinFunction::Call& call, std::size_t arity);
     std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<Object>> declaration);
+
+    template<typename T>
+    std::shared_ptr<Object> create_builtin() {
+        std::shared_ptr<T> object {std::make_shared<T>()};
+        object->type = Type::BuiltinFunction;
+
+        return object;
+    }
 
     template<typename T>
     std::shared_ptr<T> cast(const std::shared_ptr<Object>& object) {

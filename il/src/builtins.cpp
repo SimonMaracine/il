@@ -8,13 +8,7 @@
 #include "ast.hpp"
 
 namespace builtins {
-    std::shared_ptr<object::Object> clock(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) {
-        return object::create(
-            std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count()
-        );
-    }
-
-    std::shared_ptr<object::Object> print(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+    static void print_stdout(const std::vector<std::shared_ptr<object::Object>>& arguments) {
         const auto value {arguments[0u]};
 
         switch (value->type) {
@@ -40,19 +34,41 @@ namespace builtins {
                 assert(false);
                 break;
         }
+    }
+
+    std::shared_ptr<object::Object> clock::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) {
+        return object::create(
+            std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count()
+        );
+    }
+
+    std::size_t clock::arity() const {
+        return 0u;
+    }
+
+    std::shared_ptr<object::Object> print::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+        print_stdout(arguments);
 
         return object::create();
     }
 
-    std::shared_ptr<object::Object> println(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) {
-        const auto result {print(interpreter, arguments)};
+    std::size_t print::arity() const {
+        return 1u;
+    }
+
+    std::shared_ptr<object::Object> println::call(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+        print_stdout(arguments);
 
         std::cout << std::endl;
 
-        return result;
+        return object::create();
     }
 
-    std::shared_ptr<object::Object> to_string(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+    std::size_t println::arity() const {
+        return 1u;
+    }
+
+    std::shared_ptr<object::Object> to_string::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
         const auto value {arguments[0u]};
 
         switch (value->type) {
@@ -76,5 +92,9 @@ namespace builtins {
 
         assert(false);
         return nullptr;
+    }
+
+    std::size_t to_string::arity() const {
+        return 1u;
     }
 }
