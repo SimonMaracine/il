@@ -58,11 +58,11 @@ namespace object {
         return object;
     }
 
-    std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<std::shared_ptr<Object>>> declaration, std::size_t arity) {
+    std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<std::shared_ptr<Object>>> declaration) {
         std::shared_ptr<Function> object {std::make_shared<Function>()};
         object->type = Type::Function;
         object->declaration = declaration;
-        object->arity = arity;
+        object->arity = declaration->parameters.size();
 
         return object;
     }

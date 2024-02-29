@@ -64,7 +64,7 @@ namespace object {
     std::shared_ptr<Object> create(double value);
     std::shared_ptr<Object> create(bool value);
     std::shared_ptr<Object> create(const BuiltinFunction::Call& call, std::size_t arity);
-    std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<Object>> declaration, std::size_t arity);
+    std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<Object>> declaration);
 
     template<typename T>
     std::shared_ptr<T> cast(const std::shared_ptr<Object>& object) {

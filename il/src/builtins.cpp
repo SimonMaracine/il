@@ -5,6 +5,8 @@
 #include <string>
 #include <cassert>
 
+#include "ast.hpp"
+
 namespace builtins {
     std::shared_ptr<object::Object> clock(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) {
         return object::create(
@@ -28,8 +30,11 @@ namespace builtins {
             case object::Type::Boolean:
                 std::cout << std::boolalpha << object::cast<object::Boolean>(value)->value;
                 break;
+            case object::Type::BuiltinFunction:
+                std::cout << "<builtin function>";
+                break;
             case object::Type::Function:
-                std::cout << "<function>";
+                std::cout << "<function " << object::cast<object::Function>(value)->declaration->name.get_lexeme() << '>';
                 break;
             default:
                 assert(false);
@@ -59,8 +64,12 @@ namespace builtins {
                 return object::create(std::to_string(object::cast<object::Number>(value)->value));
             case object::Type::Boolean:
                 return object::create(std::string(object::cast<object::Boolean>(value)->value ? "true" : "false"));
+            case object::Type::BuiltinFunction:
+                return object::create(std::string("<builtin function>"));
             case object::Type::Function:
-                return object::create(std::string("<function>"));
+                return object::create(
+                    std::string("<function " + object::cast<object::Function>(value)->declaration->name.get_lexeme() + ">")
+                );
             default:
                 break;
         }
