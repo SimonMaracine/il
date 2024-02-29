@@ -189,7 +189,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
 
-    std::shared_ptr<object::Function> function {object::cast<object::Function>(callee)};
+    std::shared_ptr<object::BuiltinFunction> function {object::cast<object::BuiltinFunction>(callee)};
 
     if (arguments.size() != function->arity) {
         throw RuntimeError(
@@ -223,6 +223,10 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
     current_environment->define(stmt->name.get_lexeme(), value);
 
     return nullptr;
+}
+
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) {
+
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {

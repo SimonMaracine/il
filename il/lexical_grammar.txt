@@ -1,10 +1,14 @@
 program         : statement* EOF ;
 
-declaration     : var_declaration | statement ;
+declaration     : var_declaration | fun_declaration | statement ;
 
 statement       : expr_statement | block | if_statement | while_statement | for_statement ;
 
 var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
+
+fun_declaration : "fun" IDENTIFIER "(" parameters? ")" block ;
+
+parameters      : IDENTIFIER ( "," IDENTIFIER )* ;
 
 expr_statement  : expression ";" ;
 

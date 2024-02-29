@@ -28,6 +28,7 @@ private:
 
     std::shared_ptr<object::Object> visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) override;
@@ -43,4 +44,6 @@ private:
     Environment global_environment;
     Environment* current_environment {nullptr};
     Context* ctx {nullptr};
+
+    friend struct object::Function;
 };

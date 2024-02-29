@@ -169,6 +169,9 @@ namespace ast {
         struct Let;
 
         template<typename R>
+        struct Function;
+
+        template<typename R>
         struct If;
 
         template<typename R>
@@ -181,6 +184,7 @@ namespace ast {
         struct Visitor {
             virtual R visit(const Expression<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
+            virtual R visit(const Function<R>* stmt) = 0;
             virtual R visit(const If<R>* stmt) = 0;
             virtual R visit(const While<R>* stmt) = 0;
             virtual R visit(const Block<R>* stmt) = 0;
@@ -216,6 +220,20 @@ namespace ast {
 
             token::Token name;
             std::shared_ptr<Expr<R>> initializer;
+        };
+
+        template<typename R>
+        struct Function : Stmt<R> {
+            Function(const token::Token& name, const std::vector<token::Token>& parameters, const std::vector<std::shared_ptr<Stmt<R>>>& body)
+                : name(name), parameters(parameters), body(body) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            token::Token name;
+            std::vector<token::Token> parameters;
+            std::vector<std::shared_ptr<Stmt<R>>> body;
         };
 
         template<typename R>

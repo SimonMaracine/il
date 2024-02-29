@@ -231,7 +231,8 @@ void Scanner::identifier() {
         { "if", token::TokenType::If },
         { "else", token::TokenType::Else },
         { "while", token::TokenType::While },
-        { "for", token::TokenType::For }
+        { "for", token::TokenType::For },
+        { "fun", token::TokenType::Fun }
     };
 
     const auto word {source_code.substr(start, current - start)};

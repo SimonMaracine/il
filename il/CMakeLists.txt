@@ -15,6 +15,7 @@ add_executable(il
     "src/interpreter.cpp"
     "src/interpreter.hpp"
     "src/main.cpp"
+    "src/object.cpp"
     "src/object.hpp"
     "src/parser.cpp"
     "src/parser.hpp"

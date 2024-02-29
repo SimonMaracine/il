@@ -37,6 +37,10 @@ private:
                 return var_declaration<R>();
             }
 
+            if (match({token::TokenType::Fun})) {
+                return fun_declaration<R>();
+            }
+
             return statement<R>();
         } catch (ParseError) {
             synchronize();
@@ -79,6 +83,33 @@ private:
         consume(token::TokenType::Semicolon, "Expected `;` after variable declaration");
 
         return std::make_shared<ast::stmt::Let<R>>(name, initializer);
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> fun_declaration() {
+        const token::Token& name {consume(token::TokenType::Identifier, "Expected a function name")};
+
+        consume(token::TokenType::LeftParen, "Expected `(` after function name");
+
+        std::vector<token::Token> parameters;
+
+        if (!check(token::TokenType::RightParen)) {
+            do {
+                if (parameters.size() >= 255u) {
+                    error(peek(), "Too many parameters (255 maximum)");  // Don't go in panic mode
+                }
+
+                parameters.push_back(consume(token::TokenType::Identifier, "Expected a parameter name"));
+            } while (match({token::TokenType::Comma}));
+        }
+
+        consume(token::TokenType::RightParen, "Expected `)` after function parameters");
+
+        consume(token::TokenType::LeftBrace, "Expected `{` before function body");
+
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> body {block<R>()};
+
+        return std::make_shared<ast::stmt::Function<R>>(name, parameters, body);
     }
 
     template<typename R>
@@ -370,7 +401,7 @@ private:
 
         if (!check(token::TokenType::RightParen)) {
             do {
-                if (arguments.size() >= 255) {
+                if (arguments.size() >= 255u) {
                     error(peek(), "Too many arguments (255 maximum)");  // Don't go in panic mode
                 }
 
