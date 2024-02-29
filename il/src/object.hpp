@@ -5,13 +5,16 @@
 #include <vector>
 #include <cstddef>
 #include <functional>
+#include <type_traits>
+
+#include "token.hpp"
 
 class Interpreter;
 
 namespace ast {
     namespace stmt {
         template<typename R>
-        struct Function;
+        struct Stmt;
     }
 }
 
@@ -55,20 +58,31 @@ namespace object {
     struct BuiltinFunction : Object, Callable {};
 
     struct Function : Object, Callable {
+        Function(const token::Token& name)
+            : name(name) {}
+
         std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
         std::size_t arity() const override;
 
-        std::shared_ptr<ast::stmt::Function<std::shared_ptr<Object>>> declaration;
+        token::Token name;
+        std::vector<token::Token> parameters;
+        std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>> body;
     };
 
     std::shared_ptr<Object> create();
     std::shared_ptr<Object> create(const std::string& value);
     std::shared_ptr<Object> create(double value);
     std::shared_ptr<Object> create(bool value);
-    std::shared_ptr<Object> create(std::shared_ptr<ast::stmt::Function<Object>> declaration);
+    std::shared_ptr<Object> create(
+        const token::Token& name,
+        const std::vector<token::Token>& parameters,
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
+    );
 
     template<typename T>
     std::shared_ptr<Object> create_builtin() {
+        static_assert(std::is_base_of_v<BuiltinFunction, T>, "T must be a builtin function derived class");
+
         std::shared_ptr<T> object {std::make_shared<T>()};
         object->type = Type::BuiltinFunction;
 

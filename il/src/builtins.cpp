@@ -28,7 +28,7 @@ namespace builtins {
                 std::cout << "<builtin function>";
                 break;
             case object::Type::Function:
-                std::cout << "<function " << object::cast<object::Function>(value)->declaration->name.get_lexeme() << '>';
+                std::cout << "<function " << object::cast<object::Function>(value)->name.get_lexeme() << '>';
                 break;
             default:
                 assert(false);
@@ -83,9 +83,7 @@ namespace builtins {
             case object::Type::BuiltinFunction:
                 return object::create(std::string("<builtin function>"));
             case object::Type::Function:
-                return object::create(
-                    std::string("<function " + object::cast<object::Function>(value)->declaration->name.get_lexeme() + ">")
-                );
+                return object::create("<function " + object::cast<object::Function>(value)->name.get_lexeme() + ">");
             default:
                 break;
         }

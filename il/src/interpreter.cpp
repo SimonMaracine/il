@@ -199,9 +199,11 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
     }
 
     if (arguments.size() != function->arity()) {
+        const char* args_word {function->arity() == 1u ? "argument" : "arguments"};
+
         throw RuntimeError(
             expr->paren,
-            "Expected `" + std::to_string(function->arity()) + "` arguments, but got `" + std::to_string(arguments.size()) + "`"
+            "Expected " + std::to_string(function->arity()) + " " + args_word + ", but got " + std::to_string(arguments.size())
         );
     }
 
@@ -233,7 +235,11 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) {
+    std::shared_ptr<object::Object> function {object::create(stmt->name, stmt->parameters, stmt->body)};
 
+    current_environment->define(stmt->name.get_lexeme(), function);
+
+    return nullptr;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
