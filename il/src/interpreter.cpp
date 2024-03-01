@@ -5,6 +5,7 @@
 
 #include "runtime_error.hpp"
 #include "builtins.hpp"
+#include "return.hpp"
 
 Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
@@ -280,12 +281,24 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Block<std::s
     return nullptr;
 }
 
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Return<std::shared_ptr<object::Object>>* stmt) {
+    std::shared_ptr<object::Object> value {
+        stmt->value != nullptr
+        ?
+        evaluate(stmt->value)
+        :
+        object::create()
+    };
+
+    throw Return(value);
+}
+
 void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement) {
     statement->accept(this);
 }
 
 void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements, Environment&& environment) {
-    Environment* previous {current_environment};
+    Environment* previous_environment {current_environment};
 
     try {
         // Allocate a new environment and set it as the current one
@@ -296,15 +309,18 @@ void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stm
             execute(statement);
         }
     } catch (const RuntimeError&) {
-        // Reset the previous environment
-        current_environment = previous;
+        current_environment = previous_environment;
 
-        // Don't handle this exception here
+        // Don't handle error here
+        throw;
+    } catch (const Return&) {
+        current_environment = previous_environment;
+
+        // Don't handle return here
         throw;
     }
 
-    // Reset the previous environment
-    current_environment = previous;
+    current_environment = previous_environment;
 }
 
 void Interpreter::check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {

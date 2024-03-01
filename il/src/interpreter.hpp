@@ -32,6 +32,7 @@ private:
     std::shared_ptr<object::Object> visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Return<std::shared_ptr<object::Object>>* stmt) override;
 
     void execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement);
     void execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements, Environment&& environment);

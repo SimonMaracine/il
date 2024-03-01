@@ -19,6 +19,7 @@ add_executable(il
     "src/object.hpp"
     "src/parser.cpp"
     "src/parser.hpp"
+    "src/return.hpp"
     "src/runtime_error.hpp"
     "src/scanner.cpp"
     "src/scanner.hpp"

@@ -3,6 +3,7 @@
 #include "ast.hpp"
 #include "interpreter.hpp"
 #include "environment.hpp"
+#include "return.hpp"
 
 namespace object {
     std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
@@ -13,7 +14,12 @@ namespace object {
             environment.define(parameters[i].get_lexeme(), arguments[i]);
         }
 
-        interpreter->execute_block(body, std::move(environment));
+        // Using exceptions for control flow, not great
+        try {
+            interpreter->execute_block(body, std::move(environment));
+        } catch (const Return& return_value) {
+            return return_value.value;
+        }
 
         return create();
     }

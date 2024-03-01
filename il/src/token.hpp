@@ -30,7 +30,7 @@ namespace token {
         BangEqual, Greater, GreaterEqual, Less, LessEqual, EqualEqual,
 
         // Keywords
-        Let, True, False, None, Or, And, If, Else, While, For, Fun,
+        Let, True, False, None, Or, And, If, Else, While, For, Fun, Return,
 
         // Other
         Bang, Equal,
@@ -84,7 +84,7 @@ namespace token {
 
         "BangEqual"sv, "Greater"sv, "GreaterEqual"sv, "Less"sv, "LessEqual"sv, "EqualEqual"sv,
 
-        "Let"sv, "True"sv, "False"sv, "None"sv, "Or"sv, "And"sv, "If"sv, "Else"sv, "While"sv, "For"sv, "Fun"sv,
+        "Let"sv, "True"sv, "False"sv, "None"sv, "Or"sv, "And"sv, "If"sv, "Else"sv, "While"sv, "For"sv, "Fun"sv, "Return"sv,
 
         "Bang"sv, "Equal"sv
     };

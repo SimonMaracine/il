@@ -67,6 +67,10 @@ private:
             return for_statement<R>();
         }
 
+        if (match({token::TokenType::Return})) {
+            return return_statement<R>();
+        }
+
         return expr_statement<R>();
     }
 
@@ -209,6 +213,21 @@ private:
         }
 
         return body;
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> return_statement() {
+        const token::Token& keyword {previous()};
+
+        std::shared_ptr<ast::expr::Expr<R>> value;
+
+        if (!check(token::TokenType::Semicolon)) {
+            value = expression<R>();
+        }
+
+        consume(token::TokenType::Semicolon, "Expected `;` after return");
+
+        return std::make_shared<ast::stmt::Return<R>>(keyword, value);
     }
 
     template<typename R>

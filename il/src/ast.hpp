@@ -181,6 +181,9 @@ namespace ast {
         struct Block;
 
         template<typename R>
+        struct Return;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(const Expression<R>* stmt) = 0;
             virtual R visit(const Let<R>* stmt) = 0;
@@ -188,6 +191,7 @@ namespace ast {
             virtual R visit(const If<R>* stmt) = 0;
             virtual R visit(const While<R>* stmt) = 0;
             virtual R visit(const Block<R>* stmt) = 0;
+            virtual R visit(const Return<R>* stmt) = 0;
         };
 
         template<typename R>
@@ -275,6 +279,19 @@ namespace ast {
             }
 
             std::vector<std::shared_ptr<Stmt<R>>> statements;
+        };
+
+        template<typename R>
+        struct Return : Stmt<R> {
+            Return(const token::Token& keyword, std::shared_ptr<Expr<R>> value)
+                : keyword(keyword), value(value) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            token::Token keyword;
+            std::shared_ptr<Expr<R>> value;
         };
     }
 }

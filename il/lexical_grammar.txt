@@ -1,46 +1,48 @@
-program         : statement* EOF ;
+program          : statement* EOF ;
 
-declaration     : var_declaration | fun_declaration | statement ;
+declaration      : var_declaration | fun_declaration | statement ;
 
-statement       : expr_statement | block | if_statement | while_statement | for_statement ;
+statement        : expr_statement | block | if_statement | while_statement | for_statement | return_statement ;
 
-var_declaration : "let" IDENTIFIER ( "=" expression )? ";" ;
+var_declaration  : "let" IDENTIFIER ( "=" expression )? ";" ;
 
-fun_declaration : "fun" IDENTIFIER "(" parameters? ")" block ;
+fun_declaration  : "fun" IDENTIFIER "(" parameters? ")" block ;
 
-parameters      : IDENTIFIER ( "," IDENTIFIER )* ;
+parameters       : IDENTIFIER ( "," IDENTIFIER )* ;
 
-expr_statement  : expression ";" ;
+expr_statement   : expression ";" ;
 
-if_statement    : "if" "(" expression ")" statement ( "else" statement )* ;
+if_statement     : "if" "(" expression ")" statement ( "else" statement )* ;
 
-while_statement : "while" "(" expression ")" statement ;
+while_statement  : "while" "(" expression ")" statement ;
 
-for_statement   : "for" "(" ( var_declaration | expr_statement | ";" ) exression? ";" expression? ")" statement ;
+for_statement    : "for" "(" ( var_declaration | expr_statement | ";" ) exression? ";" expression? ")" statement ;
 
-block           : "{" declaration* "}" ;
+return_statement : "return" expression? ";" ;
+
+block            : "{" declaration* "}" ;
 
 
-expression      : assignment ;
+expression       : assignment ;
 
-assignment      : IDENTIFIER "=" assignment | logic_or ;
+assignment       : IDENTIFIER "=" assignment | logic_or ;
 
-logic_or        : logic_and ( "or" logic_and )* ;
+logic_or         : logic_and ( "or" logic_and )* ;
 
-logic_and       : equality ( "and" equality )* ;
+logic_and        : equality ( "and" equality )* ;
 
-equality        : comparison ( ( "!=" | "==" ) comparison )* ;
+equality         : comparison ( ( "!=" | "==" ) comparison )* ;
 
-comparison      : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+comparison       : term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 
-term            : factor ( ( "-" | "+" ) factor )* ;
+term             : factor ( ( "-" | "+" ) factor )* ;
 
-factor          : unary ( ( "/" | "*" ) unary )* ;
+factor           : unary ( ( "/" | "*" ) unary )* ;
 
-unary           : ( "-" | "!" ) unary | call ;
+unary            : ( "-" | "!" ) unary | call ;
 
-call            : primary ( "(" arguments? ")" )* ;
+call             : primary ( "(" arguments? ")" )* ;
 
-primary         : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" | IDENTIFIER ;
+primary          : NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" | IDENTIFIER ;
 
-arguments       : expression ( "," expression )* ;
+arguments        : expression ( "," expression )* ;
