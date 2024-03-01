@@ -209,11 +209,11 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
     }
 
     if (arguments.size() != callable->arity()) {
-        const char* args_word {callable->arity() == 1u ? "argument" : "arguments"};
+        const char* args {callable->arity() == 1u ? "argument" : "arguments"};
 
         throw RuntimeError(
             expr->paren,
-            "Expected " + std::to_string(callable->arity()) + " " + args_word + ", but got " + std::to_string(arguments.size())
+            "Expected " + std::to_string(callable->arity()) + " " + args + ", but got " + std::to_string(arguments.size())
         );
     }
 

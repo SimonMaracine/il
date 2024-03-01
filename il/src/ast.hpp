@@ -294,7 +294,12 @@ namespace ast {
 
         template<typename R>
         struct If : Stmt<R> {
-            If(std::shared_ptr<Expr<R>> condition, std::shared_ptr<Stmt<R>> then_branch, std::shared_ptr<Stmt<R>> else_branch, const token::Token& paren)
+            If(
+                std::shared_ptr<Expr<R>> condition,
+                std::shared_ptr<Stmt<R>> then_branch,
+                std::shared_ptr<Stmt<R>> else_branch,
+                const token::Token& paren
+            )
                 : condition(condition), then_branch(then_branch), else_branch(else_branch), paren(paren) {}
 
             R accept(Visitor<R>* visitor) override {

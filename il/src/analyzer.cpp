@@ -15,6 +15,8 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Literal<std::shared_p
 }
 
 std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Grouping<std::shared_ptr<object::Object>>* expr) {
+    // TODO don't allow function and struct declarations inside bare scopes
+
     analyze(expr->expression);
 
     return nullptr;

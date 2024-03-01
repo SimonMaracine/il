@@ -1,7 +1,7 @@
 #include "parser.hpp"
 
 bool Parser::match(std::initializer_list<token::TokenType> types) {
-    for (token::TokenType type : types) {
+    for (const token::TokenType type : types) {
         if (check(type)) {
             advance();
             return true;
