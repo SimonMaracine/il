@@ -32,6 +32,7 @@ private:
     std::shared_ptr<object::Object> visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) override;
+    std::shared_ptr<object::Object> visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::While<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) override;

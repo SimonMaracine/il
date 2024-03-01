@@ -25,11 +25,15 @@ namespace object {
         Number,
         Boolean,
         BuiltinFunction,
-        Function
+        Function,
+        Struct,
+        StructInstance
     };
 
     struct Object {
         virtual ~Object() noexcept = default;
+
+        virtual std::string to_string() const = 0;
 
         Type type {};
     };
@@ -41,25 +45,37 @@ namespace object {
         virtual std::size_t arity() const = 0;
     };
 
-    struct None : Object {};
+    struct None : Object {
+        std::string to_string() const override;
+    };
 
     struct String : Object {
+        std::string to_string() const override;
+
         std::string value;
     };
 
     struct Number : Object {
+        std::string to_string() const override;
+
         double value {};
     };
 
     struct Boolean : Object {
+        std::string to_string() const override;
+
         bool value {};
     };
 
-    struct BuiltinFunction : Object, Callable {};
+    struct BuiltinFunction : Object, Callable {
+        std::string to_string() const override;
+    };
 
     struct Function : Object, Callable {
         Function(const token::Token& name)
             : name(name) {}
+
+        std::string to_string() const override;
 
         std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
         std::size_t arity() const override;
@@ -69,18 +85,37 @@ namespace object {
         std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>> body;
     };
 
+    struct Struct : Object, Callable, public std::enable_shared_from_this<Struct> {
+        std::string to_string() const override;
+
+        std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
+        std::size_t arity() const override;
+
+        std::string name;
+    };
+
+    struct StructInstance : Object {
+        std::string to_string() const override;
+
+        std::shared_ptr<Struct> struct_;
+    };
+
     std::shared_ptr<Object> create();
     std::shared_ptr<Object> create(const std::string& value);
     std::shared_ptr<Object> create(double value);
     std::shared_ptr<Object> create(bool value);
+
     std::shared_ptr<Object> create(
         const token::Token& name,
         const std::vector<token::Token>& parameters,
         const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
     );
 
+    std::shared_ptr<Object> create_struct(const std::string& name);
+    std::shared_ptr<Object> create_struct_instance(std::shared_ptr<Struct> struct_);
+
     template<typename T>
-    std::shared_ptr<Object> create_builtin() {
+    std::shared_ptr<Object> create_builtin_function() {
         static_assert(std::is_base_of_v<BuiltinFunction, T>, "T must be a builtin function derived class");
 
         std::shared_ptr<T> object {std::make_shared<T>()};

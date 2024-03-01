@@ -6,6 +6,38 @@
 #include "return.hpp"
 
 namespace object {
+    std::string None::to_string() const {
+        return "none";
+    }
+
+    std::string String::to_string() const {
+        return value;
+    }
+
+    std::string Number::to_string() const {
+        return std::to_string(value);
+    }
+
+    std::string Boolean::to_string() const {
+        return value ? "true" : "false";
+    }
+
+    std::string BuiltinFunction::to_string() const {
+        return "<builtin function>";
+    }
+
+    std::string Function::to_string() const {
+        return "<function " + name.get_lexeme() + ">";
+    }
+
+    std::string Struct::to_string() const {
+        return "<struct " + name + ">";
+    }
+
+    std::string StructInstance::to_string() const {
+        return "<" + struct_->name + " instance>";
+    }
+
     std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
         Environment environment {&interpreter->global_environment};
 
@@ -26,6 +58,16 @@ namespace object {
 
     std::size_t Function::arity() const {
         return parameters.size();
+    }
+
+    std::shared_ptr<Object> Struct::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
+        std::shared_ptr<Object> instance {create_struct_instance(shared_from_this())};
+
+        return instance;
+    }
+
+    std::size_t Struct::arity() const {
+        return {};  // TODO
     }
 
     std::shared_ptr<Object> create() {
@@ -68,6 +110,22 @@ namespace object {
         object->type = Type::Function;
         object->parameters = parameters;
         object->body = body;
+
+        return object;
+    }
+
+    std::shared_ptr<Object> create_struct(const std::string& name) {
+        std::shared_ptr<Struct> object {std::make_shared<Struct>()};
+        object->type = Type::Struct;
+        object->name = name;
+
+        return object;
+    }
+
+    std::shared_ptr<Object> create_struct_instance(std::shared_ptr<Struct> struct_) {
+        std::shared_ptr<StructInstance> object {std::make_shared<StructInstance>()};
+        object->type = Type::StructInstance;
+        object->struct_ = struct_;
 
         return object;
     }

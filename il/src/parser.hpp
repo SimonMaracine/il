@@ -41,6 +41,10 @@ private:
                 return fun_declaration<R>();
             }
 
+            if (match({token::TokenType::Struct})) {
+                return struct_declaration<R>();
+            }
+
             return statement<R>();
         } catch (ParseError) {
             synchronize();
@@ -91,6 +95,11 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::stmt::Stmt<R>> fun_declaration() {
+        return function<R>();
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> function() {
         const token::Token& name {consume(token::TokenType::Identifier, "Expected a function name")};
 
         consume(token::TokenType::LeftParen, "Expected `(` after function name");
@@ -114,6 +123,23 @@ private:
         const std::vector<std::shared_ptr<ast::stmt::Stmt<R>>> body {block<R>()};
 
         return std::make_shared<ast::stmt::Function<R>>(name, parameters, body);
+    }
+
+    template<typename R>
+    std::shared_ptr<ast::stmt::Stmt<R>> struct_declaration() {
+        const token::Token& name {consume(token::TokenType::Identifier, "Expected a struct name")};
+
+        consume(token::TokenType::LeftBrace, "Expected `{` before struct body");
+
+        std::vector<std::shared_ptr<ast::stmt::Function<R>>> methods;
+
+        while (!check(token::TokenType::RightBrace) && !reached_end()) {
+            methods.push_back(std::static_pointer_cast<ast::stmt::Function<R>>(function<R>()));
+        }
+
+        consume(token::TokenType::RightBrace, "Expected `}` after struct body");
+
+        return std::make_shared<ast::stmt::Struct<R>>(name, methods);
     }
 
     template<typename R>

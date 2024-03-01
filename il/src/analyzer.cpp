@@ -92,6 +92,18 @@ std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Function<std::s
     return nullptr;
 }
 
+std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) {
+    if (inside_function) {
+        ctx->error(stmt->name, "Structs can only be declared at the top level");
+    }
+
+    for (const auto& method : stmt->methods) {
+        analyze(method);
+    }
+
+    return nullptr;
+}
+
 std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::If<std::shared_ptr<object::Object>>* stmt) {
     analyze(stmt->condition);
     analyze(stmt->then_branch);

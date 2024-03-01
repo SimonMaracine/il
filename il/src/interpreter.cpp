@@ -9,10 +9,10 @@
 
 Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
-    global_environment.define("clock", object::create_builtin<builtins::clock>());
-    global_environment.define("print", object::create_builtin<builtins::print>());
-    global_environment.define("println", object::create_builtin<builtins::println>());
-    global_environment.define("to_string", object::create_builtin<builtins::to_string>());
+    global_environment.define("clock", object::create_builtin_function<builtins::clock>());
+    global_environment.define("print", object::create_builtin_function<builtins::print>());
+    global_environment.define("println", object::create_builtin_function<builtins::println>());
+    global_environment.define("to_string", object::create_builtin_function<builtins::to_string>());
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -199,6 +199,9 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         case object::Type::Function:
             function = object::cast<object::Function>(callee);
             break;
+        case object::Type::Struct:
+            function = object::cast<object::Struct>(callee);
+            break;
         default:
             throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
@@ -269,6 +272,16 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std
     std::shared_ptr<object::Object> function {object::create(stmt->name, stmt->parameters, stmt->body)};
 
     current_environment->define(stmt->name.get_lexeme(), function);
+
+    return nullptr;
+}
+
+std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) {
+    current_environment->define(stmt->name.get_lexeme(), nullptr);
+
+    std::shared_ptr<object::Object> struct_ {object::create_struct(stmt->name.get_lexeme())};
+
+    current_environment->assign(stmt->name, struct_);
 
     return nullptr;
 }

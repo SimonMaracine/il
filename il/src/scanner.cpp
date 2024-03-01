@@ -233,7 +233,8 @@ void Scanner::identifier() {
         { "while", token::TokenType::While },
         { "for", token::TokenType::For },
         { "fun", token::TokenType::Fun },
-        { "return", token::TokenType::Return }
+        { "return", token::TokenType::Return },
+        { "struct", token::TokenType::Struct }
     };
 
     const auto word {source_code.substr(start, current - start)};
