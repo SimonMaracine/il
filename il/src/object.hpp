@@ -93,6 +93,7 @@ namespace object {
         std::size_t arity() const override;
 
         std::string name;
+        std::unordered_map<std::string, std::shared_ptr<Function>> methods;
     };
 
     struct StructInstance : Object {
@@ -102,7 +103,7 @@ namespace object {
         std::shared_ptr<Object> set(const token::Token& name, std::shared_ptr<Object> value);
 
         std::shared_ptr<Struct> struct_;
-        std::unordered_map<std::string, std::shared_ptr<Object>> attributes;
+        std::unordered_map<std::string, std::shared_ptr<Object>> fields;
     };
 
     std::shared_ptr<Object> create();
@@ -116,7 +117,11 @@ namespace object {
         const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
     );
 
-    std::shared_ptr<Object> create_struct(const std::string& name);
+    std::shared_ptr<Object> create_struct(
+        const std::string& name,
+        const std::unordered_map<std::string, std::shared_ptr<Function>>& methods
+    );
+
     std::shared_ptr<Object> create_struct_instance(std::shared_ptr<Struct> struct_);
 
     template<typename T>

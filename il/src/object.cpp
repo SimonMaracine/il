@@ -40,15 +40,19 @@ namespace object {
     }
 
     std::shared_ptr<Object> StructInstance::get(const token::Token& name) const {
-        if (attributes.find(name.get_lexeme()) == attributes.cend()) {
-            throw RuntimeError(name, "Undefined attribute `" + name.get_lexeme() + "`");
+        if (fields.find(name.get_lexeme()) != fields.cend()) {
+            return fields.at(name.get_lexeme());
         }
 
-        return attributes.at(name.get_lexeme());
+        if (struct_->methods.find(name.get_lexeme()) != struct_->methods.cend()) {
+            return struct_->methods.at(name.get_lexeme());
+        }
+
+        throw RuntimeError(name, "Undefined attribute `" + name.get_lexeme() + "`");
     }
 
     std::shared_ptr<Object> StructInstance::set(const token::Token& name, std::shared_ptr<Object> value) {
-        return attributes[name.get_lexeme()] = value;
+        return fields[name.get_lexeme()] = value;
     }
 
     std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
@@ -127,10 +131,14 @@ namespace object {
         return object;
     }
 
-    std::shared_ptr<Object> create_struct(const std::string& name) {
+    std::shared_ptr<Object> create_struct(
+        const std::string& name,
+        const std::unordered_map<std::string, std::shared_ptr<Function>>& methods
+    ) {
         std::shared_ptr<Struct> object {std::make_shared<Struct>()};
         object->type = Type::Struct;
         object->name = name;
+        object->methods = methods;
 
         return object;
     }
