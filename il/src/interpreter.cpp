@@ -320,7 +320,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Return<std::
         object::create()
     };
 
-    throw Return(value);
+    throw Return(value);  // Not great
 }
 
 void Interpreter::check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {
@@ -331,7 +331,11 @@ void Interpreter::check_number_operand(const token::Token& token, const std::sha
     throw RuntimeError(token, "Operand must be a number");
 }
 
-void Interpreter::check_number_operands(const token::Token& token, const std::shared_ptr<object::Object>& left, const std::shared_ptr<object::Object>& right) {
+void Interpreter::check_number_operands(
+    const token::Token& token,
+    const std::shared_ptr<object::Object>& left,
+    const std::shared_ptr<object::Object>& right
+) {
     if (left->type == object::Type::Number && right->type == object::Type::Number) {
         return;
     }

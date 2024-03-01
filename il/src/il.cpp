@@ -15,7 +15,7 @@ int Il::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
 
     if (!contents) {
-        std::cerr << "il: could not read file `" + file_path + "`\n";
+        std::cerr << "il: could not read file `" << file_path << "`\n";
         return 1;
     }
 

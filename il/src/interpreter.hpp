@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <vector>
 #include <memory>
 
@@ -39,7 +38,11 @@ private:
     std::shared_ptr<object::Object> visit(const ast::stmt::Return<std::shared_ptr<object::Object>>* stmt) override;
 
     static void check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right);
-    static void check_number_operands(const token::Token& token, const std::shared_ptr<object::Object>& left, const std::shared_ptr<object::Object>& right);
+    static void check_number_operands(
+        const token::Token& token,
+        const std::shared_ptr<object::Object>& left,
+        const std::shared_ptr<object::Object>& right
+    );
     static void check_boolean_operand(const token::Token& token, const std::shared_ptr<object::Object>& right);
     static void check_boolean_value(const token::Token& token, const std::shared_ptr<object::Object>& value);
 
