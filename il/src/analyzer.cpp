@@ -79,6 +79,10 @@ std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Let<std::shared
 }
 
 std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) {
+    if (inside_function) {
+        ctx->error(stmt->name, "Functions can only be declared at the top level");
+    }
+
     inside_function = true;
 
     analyze(stmt->body);

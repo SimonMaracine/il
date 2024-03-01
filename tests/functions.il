@@ -51,5 +51,3 @@ fun random_number() {
 }
 
 println(random_number());
-
-// return 5;
