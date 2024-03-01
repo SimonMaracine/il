@@ -9,6 +9,7 @@
 #include "parser.hpp"
 #include "object.hpp"
 #include "ast_printer.hpp"  // TODO temporary
+#include "analyzer.hpp"
 
 int Il::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
@@ -77,6 +78,13 @@ void Il::run(const std::string& source_code) {
 #endif
 
     const auto statements {parser.parse<std::shared_ptr<object::Object>>()};
+
+    if (ctx.had_error) {
+        return;
+    }
+
+    Analyzer analyzer {&ctx};
+    analyzer.analyze(statements);
 
     if (ctx.had_error) {
         return;

@@ -14,8 +14,8 @@ println(hello);
 println(say_hi);
 println(add);
 
-hello();
-println(hello());
+let result = hello();
+println(result);
 
 say_hi("Simon");
 
@@ -51,3 +51,5 @@ fun random_number() {
 }
 
 println(random_number());
+
+// return 5;

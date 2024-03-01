@@ -25,6 +25,10 @@ void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<st
     }
 }
 
+std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr) {
+    return expr->accept(this);
+}
+
 std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Literal<std::shared_ptr<object::Object>>* expr) {
     return expr->value;
 }
@@ -211,8 +215,34 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
     return function->call(this, arguments);
 }
 
-std::shared_ptr<object::Object> Interpreter::evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr) {
-    return expr->accept(this);
+void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt) {
+    stmt->accept(this);
+}
+
+void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& stmts, Environment&& environment) {
+    Environment* previous_environment {current_environment};
+
+    try {
+        // Allocate a new environment and set it as the current one
+        Environment block_environment {std::move(environment)};
+        current_environment = &block_environment;
+
+        for (const auto& statement : stmts) {
+            execute(statement);
+        }
+    } catch (const RuntimeError&) {
+        current_environment = previous_environment;
+
+        // Don't handle error here
+        throw;
+    } catch (const Return&) {
+        current_environment = previous_environment;
+
+        // Don't handle return here
+        throw;
+    }
+
+    current_environment = previous_environment;
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) {
@@ -291,36 +321,6 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Return<std::
     };
 
     throw Return(value);
-}
-
-void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> statement) {
-    statement->accept(this);
-}
-
-void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements, Environment&& environment) {
-    Environment* previous_environment {current_environment};
-
-    try {
-        // Allocate a new environment and set it as the current one
-        Environment block_environment {std::move(environment)};
-        current_environment = &block_environment;
-
-        for (const auto& statement : statements) {
-            execute(statement);
-        }
-    } catch (const RuntimeError&) {
-        current_environment = previous_environment;
-
-        // Don't handle error here
-        throw;
-    } catch (const Return&) {
-        current_environment = previous_environment;
-
-        // Don't handle return here
-        throw;
-    }
-
-    current_environment = previous_environment;
 }
 
 void Interpreter::check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {

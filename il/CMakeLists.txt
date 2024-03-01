@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
 add_executable(il
+    "src/analyzer.cpp"
+    "src/analyzer.hpp"
     "src/ast_printer.cpp"
     "src/ast_printer.hpp"
     "src/ast.hpp"
