@@ -228,6 +228,20 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Get<std::shared_pt
     return object::cast<object::StructInstance>(object)->get(expr->name);
 }
 
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Set<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> object {evaluate(expr->object)};
+
+    if (object->type != object::Type::StructInstance) {
+        throw RuntimeError(expr->name, "Only struct instances have properties");
+    }
+
+    std::shared_ptr<object::Object> value {evaluate(expr->value)};
+
+    object::cast<object::StructInstance>(object)->set(expr->name, value);
+
+    return value;
+}
+
 void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt) {
     stmt->accept(this);
 }

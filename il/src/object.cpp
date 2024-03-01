@@ -47,6 +47,10 @@ namespace object {
         return attributes.at(name.get_lexeme());
     }
 
+    std::shared_ptr<Object> StructInstance::set(const token::Token& name, std::shared_ptr<Object> value) {
+        return attributes[name.get_lexeme()] = value;
+    }
+
     std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
         Environment environment {&interpreter->global_environment};
 

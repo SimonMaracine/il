@@ -280,13 +280,25 @@ private:
 
         if (match({token::TokenType::Equal})) {
             const token::Token& equals {previous()};
+
             std::shared_ptr<ast::expr::Expr<R>> value {assignment<R>()};  // Recursively parse assignments
 
             // Check if left hand side is an l-value
-            auto variable {std::dynamic_pointer_cast<ast::expr::Variable<R>>(expr)};
 
-            if (variable != nullptr) {
-                return std::make_shared<ast::expr::Assignment<R>>(variable->name, value);
+            {
+                auto variable {std::dynamic_pointer_cast<ast::expr::Variable<R>>(expr)};
+
+                if (variable != nullptr) {
+                    return std::make_shared<ast::expr::Assignment<R>>(variable->name, value);
+                }
+            }
+
+            {
+                auto variable {std::dynamic_pointer_cast<ast::expr::Get<R>>(expr)};
+
+                if (variable != nullptr) {
+                    return std::make_shared<ast::expr::Set<R>>(variable->object, variable->name, value);
+                }
             }
 
             error(equals, "Invalid assignment target");  // Don't enter panic mode

@@ -99,6 +99,7 @@ namespace object {
         std::string to_string() const override;
 
         std::shared_ptr<Object> get(const token::Token& name) const;
+        std::shared_ptr<Object> set(const token::Token& name, std::shared_ptr<Object> value);
 
         std::shared_ptr<Struct> struct_;
         std::unordered_map<std::string, std::shared_ptr<Object>> attributes;

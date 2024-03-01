@@ -39,6 +39,9 @@ namespace ast {
         struct Get;
 
         template<typename R>
+        struct Set;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(Literal<R>* expr) = 0;
             virtual R visit(Grouping<R>* expr) = 0;
@@ -49,6 +52,7 @@ namespace ast {
             virtual R visit(Logical<R>* expr) = 0;
             virtual R visit(Call<R>* expr) = 0;
             virtual R visit(Get<R>* expr) = 0;
+            virtual R visit(Set<R>* expr) = 0;
         };
 
         template<typename R>
@@ -173,6 +177,20 @@ namespace ast {
 
             std::shared_ptr<Expr<R>> object;
             token::Token name;
+        };
+
+        template<typename R>
+        struct Set : Expr<R> {
+            Set(std::shared_ptr<Expr<R>> object, const token::Token& name, std::shared_ptr<Expr<R>> value)
+                : object(object), name(name), value(value) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> object;
+            token::Token name;
+            std::shared_ptr<Expr<R>> value;
         };
     }
 
