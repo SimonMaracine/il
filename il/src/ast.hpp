@@ -36,6 +36,9 @@ namespace ast {
         struct Call;
 
         template<typename R>
+        struct Get;
+
+        template<typename R>
         struct Visitor {
             virtual R visit(Literal<R>* expr) = 0;
             virtual R visit(Grouping<R>* expr) = 0;
@@ -45,6 +48,7 @@ namespace ast {
             virtual R visit(Assignment<R>* expr) = 0;
             virtual R visit(Logical<R>* expr) = 0;
             virtual R visit(Call<R>* expr) = 0;
+            virtual R visit(Get<R>* expr) = 0;
         };
 
         template<typename R>
@@ -156,6 +160,19 @@ namespace ast {
             std::shared_ptr<Expr<R>> callee;
             token::Token paren;
             std::vector<std::shared_ptr<Expr<R>>> arguments;
+        };
+
+        template<typename R>
+        struct Get : Expr<R> {
+            Get(std::shared_ptr<Expr<R>> object, const token::Token& name)
+                : object(object), name(name) {}
+
+            R accept(Visitor<R>* visitor) override {
+                return visitor->visit(this);
+            }
+
+            std::shared_ptr<Expr<R>> object;
+            token::Token name;
         };
     }
 

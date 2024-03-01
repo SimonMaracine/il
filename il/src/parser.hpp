@@ -392,6 +392,10 @@ private:
         while (true) {
             if (match({token::TokenType::LeftParen})) {
                 expr = finish_call<R>(expr);
+            } else if (match({token::TokenType::Dot})) {
+                const token::Token& name {consume(token::TokenType::Identifier, "Expected property name after `.`")};
+
+                expr = std::make_shared<ast::expr::Get<R>>(expr, name);
             } else {
                 break;
             }

@@ -24,6 +24,7 @@ private:
     std::shared_ptr<object::Object> visit(ast::expr::Assignment<std::shared_ptr<object::Object>>* expr) override;
     std::shared_ptr<object::Object> visit(ast::expr::Logical<std::shared_ptr<object::Object>>* expr) override;
     std::shared_ptr<object::Object> visit(ast::expr::Call<std::shared_ptr<object::Object>>* expr) override;
+    std::shared_ptr<object::Object> visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) override;
 
     void analyze(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt);
 

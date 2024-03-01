@@ -4,6 +4,7 @@
 #include "interpreter.hpp"
 #include "environment.hpp"
 #include "return.hpp"
+#include "runtime_error.hpp"
 
 namespace object {
     std::string None::to_string() const {
@@ -36,6 +37,14 @@ namespace object {
 
     std::string StructInstance::to_string() const {
         return "<" + struct_->name + " instance>";
+    }
+
+    std::shared_ptr<Object> StructInstance::get(const token::Token& name) const {
+        if (attributes.find(name.get_lexeme()) == attributes.cend()) {
+            throw RuntimeError(name, "Undefined attribute `" + name.get_lexeme() + "`");
+        }
+
+        return attributes.at(name.get_lexeme());
     }
 
     std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {

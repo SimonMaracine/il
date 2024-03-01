@@ -60,6 +60,12 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Call<std::shared_ptr<
     return nullptr;
 }
 
+std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) {
+    analyze(expr->object);
+
+    return nullptr;
+}
+
 void Analyzer::analyze(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt) {
     stmt->accept(this);
 }

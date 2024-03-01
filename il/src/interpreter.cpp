@@ -190,32 +190,42 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         arguments.push_back(evaluate(argument));
     }
 
-    std::shared_ptr<object::Callable> function;
+    std::shared_ptr<object::Callable> callable;
 
     switch (callee->type) {
         case object::Type::BuiltinFunction:
-            function = object::cast<object::BuiltinFunction>(callee);
+            callable = object::cast<object::BuiltinFunction>(callee);
             break;
         case object::Type::Function:
-            function = object::cast<object::Function>(callee);
+            callable = object::cast<object::Function>(callee);
             break;
         case object::Type::Struct:
-            function = object::cast<object::Struct>(callee);
+            callable = object::cast<object::Struct>(callee);
             break;
         default:
             throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
 
-    if (arguments.size() != function->arity()) {
-        const char* args_word {function->arity() == 1u ? "argument" : "arguments"};
+    if (arguments.size() != callable->arity()) {
+        const char* args_word {callable->arity() == 1u ? "argument" : "arguments"};
 
         throw RuntimeError(
             expr->paren,
-            "Expected " + std::to_string(function->arity()) + " " + args_word + ", but got " + std::to_string(arguments.size())
+            "Expected " + std::to_string(callable->arity()) + " " + args_word + ", but got " + std::to_string(arguments.size())
         );
     }
 
-    return function->call(this, arguments);
+    return callable->call(this, arguments);
+}
+
+std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) {
+    std::shared_ptr<object::Object> object {evaluate(expr->object)};
+
+    if (object->type != object::Type::StructInstance) {
+        throw RuntimeError(expr->name, "Only struct instances have properties");
+    }
+
+    return object::cast<object::StructInstance>(object)->get(expr->name);
 }
 
 void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt) {

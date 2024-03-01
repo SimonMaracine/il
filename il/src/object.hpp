@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <functional>
 #include <type_traits>
+#include <unordered_map>
 
 #include "token.hpp"
 
@@ -97,7 +98,10 @@ namespace object {
     struct StructInstance : Object {
         std::string to_string() const override;
 
+        std::shared_ptr<Object> get(const token::Token& name) const;
+
         std::shared_ptr<Struct> struct_;
+        std::unordered_map<std::string, std::shared_ptr<Object>> attributes;
     };
 
     std::shared_ptr<Object> create();
