@@ -17,7 +17,7 @@ namespace builtins {
         std::shared_ptr<object::Object> call(
             Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
-            const token::Token& token
+            const token::Token&
         ) override;
 
         std::size_t arity() const override;
@@ -27,7 +27,7 @@ namespace builtins {
         std::shared_ptr<object::Object> call(
             Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
-            const token::Token& token
+            const token::Token&
         ) override;
 
         std::size_t arity() const override;
@@ -37,7 +37,7 @@ namespace builtins {
         std::shared_ptr<object::Object> call(
             Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
-            const token::Token& token
+            const token::Token&
         ) override;
 
         std::size_t arity() const override;
@@ -45,7 +45,7 @@ namespace builtins {
 
     struct int_ : object::BuiltinFunction {
         std::shared_ptr<object::Object> call(
-            Interpreter* interpreter,
+            Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
             const token::Token& token
         ) override;
@@ -54,7 +54,7 @@ namespace builtins {
 
     struct float_ : object::BuiltinFunction {
         std::shared_ptr<object::Object> call(
-            Interpreter* interpreter,
+            Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
             const token::Token& token
         ) override;
@@ -66,7 +66,7 @@ namespace builtins {
         std::shared_ptr<object::Object> call(
             Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
-            const token::Token& token
+            const token::Token&
         ) override;
 
         std::size_t arity() const override;

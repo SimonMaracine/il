@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include <stdexcept>
 
 #include "ast.hpp"
 #include "interpreter.hpp"
@@ -30,7 +31,7 @@ namespace builtins {
         try {
             result = std::stod(string);
         } catch (const std::invalid_argument&) {
-            throw RuntimeError(token, "Float integer value");
+            throw RuntimeError(token, "Invalid float value");
         } catch (const std::out_of_range&) {
             throw RuntimeError(token, "Float value out of range");
         }
@@ -55,7 +56,7 @@ namespace builtins {
     std::shared_ptr<object::Object> print::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
-        const token::Token& token
+        const token::Token&
     ) {
         std::cout << arguments[0u]->to_string();
 
@@ -69,7 +70,7 @@ namespace builtins {
     std::shared_ptr<object::Object> println::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
-        const token::Token& token
+        const token::Token&
     ) {
         std::cout << arguments[0u]->to_string() << std::endl;
 
@@ -83,7 +84,7 @@ namespace builtins {
     std::shared_ptr<object::Object> str::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
-        const token::Token& token
+        const token::Token&
     ) {
         return object::create_string(arguments[0u]->to_string());
     }
@@ -93,7 +94,7 @@ namespace builtins {
     }
 
     std::shared_ptr<object::Object> int_::call(
-        Interpreter* interpreter,
+        Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
         const token::Token& token
     ) {
@@ -129,7 +130,7 @@ namespace builtins {
     }
 
     std::shared_ptr<object::Object> float_::call(
-        Interpreter* interpreter,
+        Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
         const token::Token& token
     ) {
@@ -167,7 +168,7 @@ namespace builtins {
     std::shared_ptr<object::Object> input::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
-        const token::Token& token
+        const token::Token&
     ) {
         std::cout << arguments[0u]->to_string();
 
