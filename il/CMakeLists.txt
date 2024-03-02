@@ -40,3 +40,7 @@ endif()
 
 target_compile_features(il PRIVATE cxx_std_17)
 set_target_properties(il PROPERTIES CXX_EXTENSIONS OFF)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_compile_definitions(il PRIVATE "NDEBUG")
+endif()

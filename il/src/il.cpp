@@ -11,6 +11,10 @@
 #include "ast_printer.hpp"  // TODO temporary
 #include "analyzer.hpp"
 
+static constexpr unsigned int VERSION_MAJOR {0u};
+static constexpr unsigned int VERSION_MINOR {1u};
+static constexpr unsigned int VERSION_PATCH {0u};
+
 int Il::run_file(const std::string& file_path) {
     const auto contents {read_file(file_path)};
 
@@ -33,8 +37,21 @@ int Il::run_file(const std::string& file_path) {
 }
 
 int Il::run_repl() {
+    std::cout << (
+R"(
+  _   _ 
+ (_) | |
+  _  | |
+ | | | |
+ | | | |
+ |_| |_|
+)"
+    );
+
+    std::cout << "\nil version " << VERSION_MAJOR << '.' << VERSION_MINOR << '.' << VERSION_PATCH << "\n\n";
+
     while (true) {
-        std::cout << "il> ";
+        std::cout << ">> ";
 
         std::string line;
         std::getline(std::cin, line);
