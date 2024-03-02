@@ -79,6 +79,10 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Call<std::shared_ptr<
 std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) {
     current_instance = expr->object;
 
+    if (expr->name.get_lexeme() == "init") {
+        ctx->error(expr->name, "Cannot explicitly access `init` method");
+    }
+
     analyze(expr->object);
 
     return nullptr;
