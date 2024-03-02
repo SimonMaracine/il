@@ -387,7 +387,7 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> unary() {
-        if (match({token::TokenType::Minus, token::TokenType::Bang})) {
+        if (match({token::TokenType::Minus, token::TokenType::Not})) {
             const token::Token& operator_ {previous()};
             std::shared_ptr<ast::expr::Expr<R>> right {unary<R>()};
 

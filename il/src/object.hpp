@@ -93,6 +93,7 @@ namespace object {
 
         std::string to_string() const override;
 
+        // Keep a reference to its instance at the instance creation time
         std::shared_ptr<Object> instance;
     };
 

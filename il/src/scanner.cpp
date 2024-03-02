@@ -64,7 +64,11 @@ void Scanner::scan_token() {
             add_token(token::TokenType::Star);
             break;
         case '!':
-            add_token(match('=') ? token::TokenType::BangEqual : token::TokenType::Bang);
+            if (match('=')) {
+                add_token(token::TokenType::BangEqual);
+            } else {
+                ctx->error(line, "Unexpected bare `!` character");
+            }
             break;
         case '>':
             add_token(match('=') ? token::TokenType::GreaterEqual : token::TokenType::Greater);
@@ -228,6 +232,7 @@ void Scanner::identifier() {
         { "none", token::TokenType::None },
         { "or", token::TokenType::Or },
         { "and", token::TokenType::And },
+        { "not", token::TokenType::Not },
         { "if", token::TokenType::If },
         { "else", token::TokenType::Else },
         { "while", token::TokenType::While },

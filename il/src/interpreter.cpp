@@ -48,7 +48,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_
             check_number_operand(expr->operator_, right);
 
             return object::create(-object::cast<object::Number>(right)->value);
-        case token::TokenType::Bang:
+        case token::TokenType::Not:
             check_boolean_operand(expr->operator_, right);
 
             return object::create(!object::cast<object::Boolean>(right)->value);
