@@ -62,7 +62,13 @@ void Parser::synchronize() {
         }
 
         switch (peek().get_type()) {
-            case token::TokenType::Let:  // TODO other
+            case token::TokenType::Let:
+            case token::TokenType::Fun:
+            case token::TokenType::Struct:
+            case token::TokenType::If:
+            case token::TokenType::While:
+            case token::TokenType::For:
+            case token::TokenType::Return:
                 return;
             default:
                 break;
