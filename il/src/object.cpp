@@ -1,13 +1,13 @@
 #include "object.hpp"
 
 #include <utility>
+#include <cassert>
 
 #include "ast.hpp"
 #include "interpreter.hpp"
 #include "environment.hpp"
 #include "return.hpp"
 #include "runtime_error.hpp"
-#include <cassert>
 
 namespace object {
     std::string None::to_string() const {
@@ -72,7 +72,7 @@ namespace object {
 
         // Using exceptions for control flow, not great
         try {
-            interpreter->execute_block(body, std::move(environment));
+            interpreter->execute(body, std::move(environment));
         } catch (const Return& return_value) {
             return return_value.value;
         }

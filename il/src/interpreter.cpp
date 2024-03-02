@@ -266,7 +266,7 @@ void Interpreter::execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object
     stmt->accept(this);
 }
 
-void Interpreter::execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& stmts, Environment&& environment) {
+void Interpreter::execute(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& stmts, Environment&& environment) {
     Environment* previous_environment {current_environment};
 
     try {
@@ -379,7 +379,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::While<std::s
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) {
-    execute_block(stmt->statements, Environment(current_environment));
+    execute(stmt->statements, Environment(current_environment));
 
     return nullptr;
 }

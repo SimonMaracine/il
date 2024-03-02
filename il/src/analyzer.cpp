@@ -15,8 +15,6 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Literal<std::shared_p
 }
 
 std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Grouping<std::shared_ptr<object::Object>>* expr) {
-    // TODO don't allow function and struct declarations inside bare scopes
-
     analyze(expr->expression);
 
     return nullptr;
@@ -102,6 +100,10 @@ std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Function<std::s
         ctx->error(stmt->name, "Functions can only be declared at the top level");
     }
 
+    if (inside_block) {
+        ctx->error(stmt->name, "Functions can only be declared at the top level, outside of blocks");
+    }
+
     inside_function = true;
 
     analyze(stmt->body);
@@ -114,6 +116,10 @@ std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Function<std::s
 std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) {
     if (inside_function) {
         ctx->error(stmt->name, "Structs can only be declared at the top level");
+    }
+
+    if (inside_block) {
+        ctx->error(stmt->name, "Structs can only be declared at the top level, outside of blocks");
     }
 
     for (const auto& method : stmt->methods) {
@@ -142,7 +148,11 @@ std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::While<std::shar
 }
 
 std::shared_ptr<object::Object> Analyzer::visit(const ast::stmt::Block<std::shared_ptr<object::Object>>* stmt) {
+    inside_block = true;
+
     analyze(stmt->statements);
+
+    inside_block = false;
 
     return nullptr;
 }

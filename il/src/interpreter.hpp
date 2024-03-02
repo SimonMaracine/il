@@ -29,7 +29,7 @@ private:
     std::shared_ptr<object::Object> visit(ast::expr::Set<std::shared_ptr<object::Object>>* expr) override;
 
     void execute(std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>> stmt);
-    void execute_block(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& stmts, Environment&& environment);
+    void execute(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& stmts, Environment&& environment);
 
     std::shared_ptr<object::Object> visit(const ast::stmt::Expression<std::shared_ptr<object::Object>>* stmt) override;
     std::shared_ptr<object::Object> visit(const ast::stmt::Let<std::shared_ptr<object::Object>>* stmt) override;
