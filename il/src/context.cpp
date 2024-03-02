@@ -15,7 +15,7 @@ void Context::error(std::size_t line, const std::string& message) {
 }
 
 void Context::runtime_error(const token::Token& token, const std::string& message) {
-    std::cerr << message << "\n[line " << std::to_string(token.get_line()) << "]\n";
+    std::cerr << "[line " << std::to_string(token.get_line()) << "] " << message << '\n';
     had_runtime_error = true;
 }
 
