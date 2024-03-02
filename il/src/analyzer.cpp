@@ -2,9 +2,6 @@
 
 void Analyzer::analyze(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
     for (const auto& statement : statements) {
-        // Reset the current instance, because it cannot be used for method calls from now on
-        current_instance.reset();
-
         analyze(statement);
     }
 }
@@ -58,17 +55,6 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Logical<std::shared_p
 std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Call<std::shared_ptr<object::Object>>* expr) {
     analyze(expr->callee);
 
-    {
-        auto instance {current_instance.lock()};
-
-        if (instance != nullptr) {
-            // We are calling a method
-
-            expr->arguments.insert(expr->arguments.cbegin(), instance);
-            current_instance.reset();
-        }
-    }
-
     for (const auto& argument : expr->arguments) {
         analyze(argument);
     }
@@ -77,8 +63,6 @@ std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Call<std::shared_ptr<
 }
 
 std::shared_ptr<object::Object> Analyzer::visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) {
-    current_instance = expr->object;
-
     if (expr->name.get_lexeme() == "init") {
         ctx->error(expr->name, "Cannot explicitly access `init` method");
     }

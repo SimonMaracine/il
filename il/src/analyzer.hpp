@@ -39,7 +39,6 @@ private:
     std::shared_ptr<object::Object> visit(const ast::stmt::Return<std::shared_ptr<object::Object>>* stmt) override;
 
     bool inside_function {false};
-    std::weak_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> current_instance;
 
     Context* ctx {nullptr};
 };

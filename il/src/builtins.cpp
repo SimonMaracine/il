@@ -34,7 +34,7 @@ namespace builtins {
         return 1u;
     }
 
-    std::shared_ptr<object::Object> println::call(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) {
+    std::shared_ptr<object::Object> println::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
         print_stdout(arguments);
 
         std::cout << std::endl;

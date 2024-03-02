@@ -14,7 +14,7 @@ namespace builtins {
     };
 
     struct println : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
         std::size_t arity() const override;
     };
 

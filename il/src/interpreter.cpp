@@ -189,10 +189,6 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
 
     std::vector<std::shared_ptr<object::Object>> arguments;
 
-    for (const std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>>& argument : expr->arguments) {
-        arguments.push_back(evaluate(argument));
-    }
-
     std::shared_ptr<object::Callable> callable;
 
     switch (callee->type) {
@@ -212,7 +208,19 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
             throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
 
-    // Instance arguments on methods are already there, if they are called on the instance object
+    if (callee->type == object::Type::Method) {
+        // For methods, pass the instance first
+
+        auto instance {object::cast<object::Method>(callee)->instance};
+
+        assert(instance != nullptr);
+
+        arguments.push_back(instance);
+    }
+
+    for (const std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>>& argument : expr->arguments) {
+        arguments.push_back(evaluate(argument));
+    }
 
     const std::size_t arguments_size {
         callee->type == object::Type::Struct ? arguments.size() + 1u : arguments.size()

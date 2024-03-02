@@ -1,5 +1,7 @@
 #include "object.hpp"
 
+#include <utility>
+
 #include "ast.hpp"
 #include "interpreter.hpp"
 #include "environment.hpp"
@@ -49,8 +51,8 @@ namespace object {
             return fields.at(name.get_lexeme());
         }
 
-        if (struct_->methods.find(name.get_lexeme()) != struct_->methods.cend()) {
-            return struct_->methods.at(name.get_lexeme());
+        if (methods.find(name.get_lexeme()) != methods.cend()) {
+            return methods.at(name.get_lexeme());
         }
 
         throw RuntimeError(name, "Undefined attribute `" + name.get_lexeme() + "`");
@@ -85,6 +87,11 @@ namespace object {
     std::shared_ptr<Object> Struct::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
         std::shared_ptr<StructInstance> instance {cast<StructInstance>(create_struct_instance(shared_from_this()))};
 
+        // Bind the instance to the methods
+        for (auto& [_, method] : instance->methods) {
+            method->instance = instance;
+        }
+
         // Call the initialzer, if there is one
         // Instance argument must be passed here
 
@@ -103,7 +110,7 @@ namespace object {
             return methods.at("init")->arity();
         }
 
-        return 0u;
+        return 1u;
     }
 
     std::shared_ptr<Object> create() {
@@ -166,6 +173,11 @@ namespace object {
         std::shared_ptr<StructInstance> object {std::make_shared<StructInstance>()};
         object->type = Type::StructInstance;
         object->struct_ = struct_;
+
+        // Create deep copies of the methods
+        for (const auto& [name, method] : struct_->methods) {
+            object->methods[name] = std::make_shared<Method>(*method);
+        }
 
         return object;
     }

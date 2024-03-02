@@ -40,4 +40,8 @@ println(simon.is_adult());
 alice.say_hi();
 println(alice.is_adult());
 
-// println(simon.init("SIMON", 22, 1.75));
+alice.skill = "piano";
+
+println(alice.skill);
+
+// simon.init("SIMON", 22, 1.75);
