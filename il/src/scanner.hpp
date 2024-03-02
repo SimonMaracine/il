@@ -18,6 +18,7 @@ private:
     char advance();
     void add_token(token::TokenType type);
     void add_token(token::TokenType type, std::string&& value);
+    void add_token(token::TokenType type, long long value);
     void add_token(token::TokenType type, double value);
     bool match(char character);
     char peek();
@@ -29,6 +30,7 @@ private:
     void string();
     void number();
     void identifier();
+    long long parse_long_long(const std::string& string);
     double parse_double(const std::string& string);
 
     std::string source_code;

@@ -224,7 +224,7 @@ private:
         }
 
         if (condition == nullptr) {
-            condition = std::make_shared<ast::expr::Literal<R>>(object::create(true));
+            condition = std::make_shared<ast::expr::Literal<R>>(object::create_bool(true));
         }
 
         body = std::make_shared<ast::stmt::While<R>>(condition, body, paren);
@@ -418,12 +418,14 @@ private:
 
     template<typename R>
     std::shared_ptr<ast::expr::Expr<R>> primary() {
-        if (match({token::TokenType::Number, token::TokenType::String})) {
+        if (match({token::TokenType::String, token::TokenType::Integer, token::TokenType::Float})) {
             switch (previous().get_type()) {
                 case token::TokenType::String:
-                    return std::make_shared<ast::expr::Literal<R>>(object::create(std::get<1u>(previous().get_literal())));
-                case token::TokenType::Number:
-                    return std::make_shared<ast::expr::Literal<R>>(object::create(std::get<2u>(previous().get_literal())));
+                    return std::make_shared<ast::expr::Literal<R>>(object::create_string(std::get<1u>(previous().get_literal())));
+                case token::TokenType::Integer:
+                    return std::make_shared<ast::expr::Literal<R>>(object::create_integer(std::get<2u>(previous().get_literal())));
+                case token::TokenType::Float:
+                    return std::make_shared<ast::expr::Literal<R>>(object::create_float(std::get<3u>(previous().get_literal())));
                 default:
                     assert(false);
                     break;
@@ -431,15 +433,15 @@ private:
         }
 
         if (match({token::TokenType::True})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create(true));
+            return std::make_shared<ast::expr::Literal<R>>(object::create_bool(true));
         }
 
         if (match({token::TokenType::False})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create(false));
+            return std::make_shared<ast::expr::Literal<R>>(object::create_bool(false));
         }
 
         if (match({token::TokenType::None})) {
-            return std::make_shared<ast::expr::Literal<R>>(object::create());
+            return std::make_shared<ast::expr::Literal<R>>(object::create_none());
         }
 
         if (match({token::TokenType::Identifier})) {

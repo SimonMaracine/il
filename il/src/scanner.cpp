@@ -122,6 +122,10 @@ void Scanner::add_token(token::TokenType type, std::string&& value) {
     tokens.emplace_back(type, source_code.substr(start, current - start), line, std::move(value));
 }
 
+void Scanner::add_token(token::TokenType type, long long value) {
+    tokens.emplace_back(type, source_code.substr(start, current - start), line, value);
+}
+
 void Scanner::add_token(token::TokenType type, double value) {
     tokens.emplace_back(type, source_code.substr(start, current - start), line, value);
 }
@@ -208,7 +212,11 @@ void Scanner::number() {
         advance();
     }
 
+    bool floating_point {false};
+
     if (peek() == '.' && is_digit(peekTwo())) {
+        floating_point = true;
+
         // Consume the dot
         advance();
 
@@ -217,7 +225,11 @@ void Scanner::number() {
         }
     }
 
-    add_token(token::TokenType::Number, parse_double(source_code.substr(start, current - start)));
+    if (floating_point) {
+        add_token(token::TokenType::Float, parse_double(source_code.substr(start, current - start)));
+    } else {
+        add_token(token::TokenType::Integer, parse_long_long(source_code.substr(start, current - start)));
+    }
 }
 
 void Scanner::identifier() {
@@ -250,6 +262,21 @@ void Scanner::identifier() {
     }
 
     add_token(token::TokenType::Identifier);
+}
+
+long long Scanner::parse_long_long(const std::string& string) {
+    long long result {};
+
+    try {
+        result = std::stoll(string);
+    } catch (const std::invalid_argument&) {
+        assert(false);
+    } catch (const std::out_of_range&) {
+        ctx->error(line, "Number out of range");
+        return 0ll;
+    }
+
+    return result;
 }
 
 double Scanner::parse_double(const std::string& string) {

@@ -45,13 +45,17 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Unary<std::shared_
 
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
-            check_number_operand(expr->operator_, right);
+            if (right->type == object::Type::Integer) {
+                return object::create_integer(-object::cast<object::Integer>(right)->value);
+            } else if (right->type == object::Type::Float) {
+                return object::create_float(-object::cast<object::Float>(right)->value);
+            }
 
-            return object::create(-object::cast<object::Number>(right)->value);
+            throw RuntimeError(expr->operator_, "Operand must be either integer or float");
         case token::TokenType::Not:
             check_boolean_operand(expr->operator_, right);
 
-            return object::create(!object::cast<object::Boolean>(right)->value);
+            return object::create_bool(!object::cast<object::Boolean>(right)->value);
         default:
             break;
     }
@@ -66,73 +70,151 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
 
     switch (expr->operator_.get_type()) {
         case token::TokenType::Minus:
-            check_number_operands(expr->operator_, left, right);
-
-            return object::create(
-                object::cast<object::Number>(left)->value - object::cast<object::Number>(right)->value
-            );
-        case token::TokenType::Plus:
-            if (left->type == object::Type::Number && right->type == object::Type::Number) {
-                return object::create(
-                    object::cast<object::Number>(left)->value + object::cast<object::Number>(right)->value
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value - object::cast<object::Integer>(right)->value
                 );
             }
 
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value - object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
+        case token::TokenType::Plus:
             if (left->type == object::Type::String && right->type == object::Type::String) {
-                return object::create(
+                return object::create_string(
                     object::cast<object::String>(left)->value + object::cast<object::String>(right)->value
                 );
             }
 
-            throw RuntimeError(expr->operator_, "Operands must be either numbers or strings");
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value + object::cast<object::Integer>(right)->value
+                );
+            }
+
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value + object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers, floats or strings");
         case token::TokenType::Slash:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value / object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value / object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value / object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::Star:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value * object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value * object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value * object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::Greater:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value > object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value > object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value > object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::GreaterEqual:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value >= object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value >= object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value >= object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::Less:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value < object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value < object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value < object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::LessEqual:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value <= object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value <= object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value <= object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::BangEqual:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value != object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value != object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value != object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::EqualEqual:
-            check_number_operands(expr->operator_, left, right);
+            if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
+                return object::create_integer(
+                    object::cast<object::Integer>(left)->value == object::cast<object::Integer>(right)->value
+                );
+            }
 
-            return object::create(
-                object::cast<object::Number>(left)->value == object::cast<object::Number>(right)->value
-            );
+            if (left->type == object::Type::Float && right->type == object::Type::Float) {
+                return object::create_float(
+                    object::cast<object::Float>(left)->value == object::cast<object::Float>(right)->value
+                );
+            }
+
+            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         default:
             break;
     }
@@ -161,7 +243,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
             check_boolean_value(expr->operator_, left);
 
             if (object::cast<object::Boolean>(left)->value) {
-                return object::create(true);
+                return object::create_bool(true);
             }
 
             break;
@@ -169,7 +251,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
             check_boolean_value(expr->operator_, left);
 
             if (!object::cast<object::Boolean>(left)->value) {
-                return object::create(false);
+                return object::create_bool(false);
             }
 
             break;
@@ -181,7 +263,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Logical<std::share
 
     check_boolean_value(expr->operator_, right);
 
-    return object::create(object::cast<object::Boolean>(right)->value);
+    return object::create_bool(object::cast<object::Boolean>(right)->value);
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_ptr<object::Object>>* expr) {
@@ -304,7 +386,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
         ?
         evaluate(stmt->initializer)
         :
-        object::create()
+        object::create_none()
     };
 
     current_environment->define(stmt->name.get_lexeme(), value);
@@ -313,7 +395,7 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Let<std::sha
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std::shared_ptr<object::Object>>* stmt) {
-    std::shared_ptr<object::Object> function {object::create(stmt->name, stmt->parameters, stmt->body)};
+    std::shared_ptr<object::Object> function {object::create_function(stmt->name, stmt->parameters, stmt->body)};
 
     current_environment->define(stmt->name.get_lexeme(), function);
 
@@ -390,30 +472,10 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Return<std::
         ?
         evaluate(stmt->value)
         :
-        object::create()
+        object::create_none()
     };
 
     throw Return(value);  // Not great
-}
-
-void Interpreter::check_number_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {
-    if (right->type == object::Type::Number) {
-        return;
-    }
-
-    throw RuntimeError(token, "Operand must be a number");
-}
-
-void Interpreter::check_number_operands(
-    const token::Token& token,
-    const std::shared_ptr<object::Object>& left,
-    const std::shared_ptr<object::Object>& right
-) {
-    if (left->type == object::Type::Number && right->type == object::Type::Number) {
-        return;
-    }
-
-    throw RuntimeError(token, "Operands must be numbers");
 }
 
 void Interpreter::check_boolean_operand(const token::Token& token, const std::shared_ptr<object::Object>& right) {

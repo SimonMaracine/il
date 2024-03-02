@@ -15,8 +15,10 @@ std::string AstPrinter::visit(ast::expr::Literal<std::string>* expr) {
             return "none";
         case object::Type::String:
             return object::cast<object::String>(expr->value)->value;
-        case object::Type::Number:
-            return std::to_string(object::cast<object::Number>(expr->value)->value);
+        case object::Type::Integer:
+            return std::to_string(object::cast<object::Integer>(expr->value)->value);
+        case object::Type::Float:
+            return std::to_string(object::cast<object::Float>(expr->value)->value);
         case object::Type::Boolean:
             return std::to_string(object::cast<object::Boolean>(expr->value)->value);
         default:

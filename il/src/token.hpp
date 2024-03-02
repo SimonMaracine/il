@@ -15,7 +15,7 @@ namespace token {
         Eof,
 
         // Literals
-        Identifier, String, Number,
+        Identifier, String, Integer, Float,
 
         // Parentheses
         LeftParen, RightParen, LeftBrace, RightBrace,
@@ -41,7 +41,7 @@ namespace token {
     class Token {
     public:
         struct Empty {};
-        using Literal = std::variant<Empty, std::string, double>;
+        using Literal = std::variant<Empty, std::string, long long, double>;
 
         Token(TokenType type, const std::string& lexeme, std::size_t line)
             : type(type), line(line), lexeme(lexeme) {}
@@ -51,9 +51,14 @@ namespace token {
             assert(type == TokenType::String);
         }
 
+        Token(TokenType type, const std::string& lexeme, std::size_t line, long long value)
+            : type(type), line(line), lexeme(lexeme), literal(value) {
+            assert(type == TokenType::Integer);
+        }
+
         Token(TokenType type, const std::string& lexeme, std::size_t line, double value)
             : type(type), line(line), lexeme(lexeme), literal(value) {
-            assert(type == TokenType::Number);
+            assert(type == TokenType::Float);
         }
 
         TokenType get_type() const { return type; };
@@ -74,7 +79,7 @@ namespace token {
     inline constexpr std::array TOKEN_NAMES {
         "Eof"sv,
 
-        "Identifier"sv, "String"sv, "Number"sv,
+        "Identifier"sv, "String"sv, "Integer"sv, "Float"sv,
 
         "LeftParen"sv, "RightParen"sv, "LeftBrace"sv, "RightBrace"sv,
 
@@ -104,8 +109,11 @@ namespace token {
             case TokenType::String:
                 stream << ' ' << std::get<1u>(token.literal);
                 break;
-            case TokenType::Number:
+            case TokenType::Integer:
                 stream << ' ' << std::get<2u>(token.literal);
+                break;
+            case TokenType::Float:
+                stream << ' ' << std::get<3u>(token.literal);
                 break;
             default:
                 break;

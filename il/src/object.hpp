@@ -23,7 +23,8 @@ namespace object {
     enum class Type {
         None,
         String,
-        Number,
+        Integer,
+        Float,
         Boolean,
         BuiltinFunction,
         Function,
@@ -57,7 +58,13 @@ namespace object {
         std::string value;
     };
 
-    struct Number : Object {
+    struct Integer : Object {
+        std::string to_string() const override;
+
+        long long value {};
+    };
+
+    struct Float : Object {
         std::string to_string() const override;
 
         double value {};
@@ -118,12 +125,13 @@ namespace object {
         std::unordered_map<std::string, std::shared_ptr<Object>> fields;
     };
 
-    std::shared_ptr<Object> create();
-    std::shared_ptr<Object> create(const std::string& value);
-    std::shared_ptr<Object> create(double value);
-    std::shared_ptr<Object> create(bool value);
+    std::shared_ptr<Object> create_none();
+    std::shared_ptr<Object> create_string(const std::string& value);
+    std::shared_ptr<Object> create_integer(long long value);
+    std::shared_ptr<Object> create_float(double value);
+    std::shared_ptr<Object> create_bool(bool value);
 
-    std::shared_ptr<Object> create(
+    std::shared_ptr<Object> create_function(
         const token::Token& name,
         const std::vector<token::Token>& parameters,
         const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
@@ -144,7 +152,7 @@ namespace object {
 
     template<typename T>
     std::shared_ptr<Object> create_builtin_function() {
-        static_assert(std::is_base_of_v<BuiltinFunction, T>, "T must be a builtin function derived class");
+        static_assert(std::is_base_of_v<BuiltinFunction, T>, "Type must be a builtin function derived class");
 
         std::shared_ptr<T> object {std::make_shared<T>()};
         object->type = Type::BuiltinFunction;

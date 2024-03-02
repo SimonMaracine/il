@@ -15,7 +15,7 @@ namespace builtins {
     }
 
     std::shared_ptr<object::Object> clock::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) {
-        return object::create(
+        return object::create_float(
             std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count()
         );
     }
@@ -27,7 +27,7 @@ namespace builtins {
     std::shared_ptr<object::Object> print::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
         print_stdout(arguments);
 
-        return object::create();
+        return object::create_none();
     }
 
     std::size_t print::arity() const {
@@ -39,7 +39,7 @@ namespace builtins {
 
         std::cout << std::endl;
 
-        return object::create();
+        return object::create_none();
     }
 
     std::size_t println::arity() const {
@@ -49,7 +49,7 @@ namespace builtins {
     std::shared_ptr<object::Object> to_string::call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) {
         const auto value {arguments[0u]};
 
-        return object::create(value->to_string());
+        return object::create_string(value->to_string());
     }
 
     std::size_t to_string::arity() const {

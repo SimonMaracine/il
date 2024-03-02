@@ -18,7 +18,11 @@ namespace object {
         return value;
     }
 
-    std::string Number::to_string() const {
+    std::string Integer::to_string() const {
+        return std::to_string(value);
+    }
+
+    std::string Float::to_string() const {
         return std::to_string(value);
     }
 
@@ -77,7 +81,7 @@ namespace object {
             return return_value.value;
         }
 
-        return create();
+        return create_none();
     }
 
     std::size_t Function::arity() const {
@@ -113,14 +117,14 @@ namespace object {
         return 1u;
     }
 
-    std::shared_ptr<Object> create() {
+    std::shared_ptr<Object> create_none() {
         std::shared_ptr<None> object {std::make_shared<None>()};
         object->type = Type::None;
 
         return object;
     }
 
-    std::shared_ptr<Object> create(const std::string& value) {
+    std::shared_ptr<Object> create_string(const std::string& value) {
         std::shared_ptr<String> object {std::make_shared<String>()};
         object->type = Type::String;
         object->value = value;
@@ -128,15 +132,23 @@ namespace object {
         return object;
     }
 
-    std::shared_ptr<Object> create(double value) {
-        std::shared_ptr<Number> object {std::make_shared<Number>()};
-        object->type = Type::Number;
+    std::shared_ptr<Object> create_integer(long long value) {
+        std::shared_ptr<Integer> object {std::make_shared<Integer>()};
+        object->type = Type::Integer;
         object->value = value;
 
         return object;
     }
 
-    std::shared_ptr<Object> create(bool value) {
+    std::shared_ptr<Object> create_float(double value) {
+        std::shared_ptr<Float> object {std::make_shared<Float>()};
+        object->type = Type::Float;
+        object->value = value;
+
+        return object;
+    }
+
+    std::shared_ptr<Object> create_bool(bool value) {
         std::shared_ptr<Boolean> object {std::make_shared<Boolean>()};
         object->type = Type::Boolean;
         object->value = value;
@@ -144,7 +156,7 @@ namespace object {
         return object;
     }
 
-    std::shared_ptr<Object> create(
+    std::shared_ptr<Object> create_function(
         const token::Token& name,
         const std::vector<token::Token>& parameters,
         const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
