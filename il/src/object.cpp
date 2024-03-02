@@ -83,13 +83,27 @@ namespace object {
     }
 
     std::shared_ptr<Object> Struct::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
-        std::shared_ptr<Object> instance {create_struct_instance(shared_from_this())};
+        std::shared_ptr<StructInstance> instance {cast<StructInstance>(create_struct_instance(shared_from_this()))};
+
+        // Call the initialzer, if there is one
+        // Instance argument must be passed here
+
+        auto arguments_and_self {arguments};
+        arguments_and_self.insert(arguments_and_self.cbegin(), instance);
+
+        if (methods.find("init") != methods.cend()) {
+            methods.at("init")->call(interpreter, arguments_and_self);
+        }
 
         return instance;
     }
 
     std::size_t Struct::arity() const {
-        return {};  // TODO
+        if (methods.find("init") != methods.cend()) {
+            return methods.at("init")->arity();
+        }
+
+        return 0u;
     }
 
     std::shared_ptr<Object> create() {

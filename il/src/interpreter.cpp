@@ -4,6 +4,7 @@
 #include <utility>
 #include <unordered_map>
 #include <string>
+#include <cstddef>
 
 #include "runtime_error.hpp"
 #include "builtins.hpp"
@@ -213,12 +214,16 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
 
     // Instance arguments on methods are already there, if they are called on the instance object
 
-    if (arguments.size() != callable->arity()) {
+    const std::size_t arguments_size {
+        callee->type == object::Type::Struct ? arguments.size() + 1u : arguments.size()
+    };
+
+    if (arguments_size != callable->arity()) {
         const char* args {callable->arity() == 1u ? "argument" : "arguments"};
 
         throw RuntimeError(
             expr->paren,
-            "Expected " + std::to_string(callable->arity()) + " " + args + ", but got " + std::to_string(arguments.size())
+            "Expected " + std::to_string(callable->arity()) + " " + args + ", but got " + std::to_string(arguments_size)
         );
     }
 
