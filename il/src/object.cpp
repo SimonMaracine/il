@@ -31,6 +31,10 @@ namespace object {
         return "<function " + name.get_lexeme() + ">";
     }
 
+    std::string Method::to_string() const {
+        return "<method " + name.get_lexeme() + " on struct " + instance->to_string() + ">";
+    }
+
     std::string Struct::to_string() const {
         return "<struct " + name + ">";
     }
@@ -133,7 +137,7 @@ namespace object {
 
     std::shared_ptr<Object> create_struct(
         const std::string& name,
-        const std::unordered_map<std::string, std::shared_ptr<Function>>& methods
+        const std::unordered_map<std::string, std::shared_ptr<Method>>& methods
     ) {
         std::shared_ptr<Struct> object {std::make_shared<Struct>()};
         object->type = Type::Struct;
@@ -147,6 +151,21 @@ namespace object {
         std::shared_ptr<StructInstance> object {std::make_shared<StructInstance>()};
         object->type = Type::StructInstance;
         object->struct_ = struct_;
+
+        return object;
+    }
+
+    std::shared_ptr<Object> create_method(
+        const token::Token& name,
+        const std::vector<token::Token>& parameters,
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body,
+        std::shared_ptr<StructInstance> instance
+    ) {
+        std::shared_ptr<Method> object {std::make_shared<Method>(name)};
+        object->type = Type::Method;
+        object->parameters = parameters;
+        object->body = body;
+        object->instance = instance;
 
         return object;
     }

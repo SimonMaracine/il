@@ -305,12 +305,15 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) {
     current_environment->define(stmt->name.get_lexeme(), nullptr);
 
-    std::unordered_map<std::string, std::shared_ptr<object::Function>> methods;
+    std::unordered_map<std::string, std::shared_ptr<object::Method>> methods;
 
     for (const auto& method : stmt->methods) {
-        methods[method->name.get_lexeme()] = (
-            object::cast<object::Function>(object::create(method->name, method->parameters, method->body))
-        );
+        methods[method->name.get_lexeme()] = object::cast<object::Method>(object::create_method(
+            method->name,
+            method->parameters,
+            method->body,
+            
+        ));
     }
 
     std::shared_ptr<object::Object> struct_ {object::create_struct(stmt->name.get_lexeme(), methods)};

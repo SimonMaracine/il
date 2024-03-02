@@ -27,6 +27,7 @@ namespace object {
         Boolean,
         BuiltinFunction,
         Function,
+        Method,
         Struct,
         StructInstance
     };
@@ -86,6 +87,15 @@ namespace object {
         std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>> body;
     };
 
+    struct Method : Function {
+        Method(const token::Token& name)
+            : Function(name) {}
+
+        std::string to_string() const override;
+
+        std::shared_ptr<StructInstance> instance;
+    };
+
     struct Struct : Object, Callable, public std::enable_shared_from_this<Struct> {
         std::string to_string() const override;
 
@@ -93,7 +103,7 @@ namespace object {
         std::size_t arity() const override;
 
         std::string name;
-        std::unordered_map<std::string, std::shared_ptr<Function>> methods;
+        std::unordered_map<std::string, std::shared_ptr<Method>> methods;
     };
 
     struct StructInstance : Object {
@@ -117,9 +127,16 @@ namespace object {
         const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
     );
 
+    std::shared_ptr<Object> create_method(
+        const token::Token& name,
+        const std::vector<token::Token>& parameters,
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body,
+        std::shared_ptr<StructInstance> instance
+    );
+
     std::shared_ptr<Object> create_struct(
         const std::string& name,
-        const std::unordered_map<std::string, std::shared_ptr<Function>>& methods
+        const std::unordered_map<std::string, std::shared_ptr<Method>>& methods
     );
 
     std::shared_ptr<Object> create_struct_instance(std::shared_ptr<Struct> struct_);
