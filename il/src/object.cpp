@@ -5,6 +5,7 @@
 #include "environment.hpp"
 #include "return.hpp"
 #include "runtime_error.hpp"
+#include <cassert>
 
 namespace object {
     std::string None::to_string() const {
@@ -32,7 +33,7 @@ namespace object {
     }
 
     std::string Method::to_string() const {
-        return "<method " + name.get_lexeme() + " on struct " + instance->to_string() + ">";
+        return "<method " + name.get_lexeme() + ">";
     }
 
     std::string Struct::to_string() const {
@@ -158,14 +159,14 @@ namespace object {
     std::shared_ptr<Object> create_method(
         const token::Token& name,
         const std::vector<token::Token>& parameters,
-        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body,
-        std::shared_ptr<StructInstance> instance
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
     ) {
         std::shared_ptr<Method> object {std::make_shared<Method>(name)};
         object->type = Type::Method;
         object->parameters = parameters;
         object->body = body;
-        object->instance = instance;
+
+        assert(parameters.size() > 0u);
 
         return object;
     }

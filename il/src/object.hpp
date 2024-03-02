@@ -92,8 +92,6 @@ namespace object {
             : Function(name) {}
 
         std::string to_string() const override;
-
-        std::shared_ptr<StructInstance> instance;
     };
 
     struct Struct : Object, Callable, public std::enable_shared_from_this<Struct> {
@@ -130,8 +128,7 @@ namespace object {
     std::shared_ptr<Object> create_method(
         const token::Token& name,
         const std::vector<token::Token>& parameters,
-        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body,
-        std::shared_ptr<StructInstance> instance
+        const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<Object>>>>& body
     );
 
     std::shared_ptr<Object> create_struct(

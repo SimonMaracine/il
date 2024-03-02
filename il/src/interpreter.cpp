@@ -201,12 +201,17 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         case object::Type::Function:
             callable = object::cast<object::Function>(callee);
             break;
+        case object::Type::Method:
+            callable = object::cast<object::Method>(callee);
+            break;
         case object::Type::Struct:
             callable = object::cast<object::Struct>(callee);
             break;
         default:
             throw RuntimeError(expr->paren, "Only functions and classes are callable");
     }
+
+    // Instance arguments on methods are already there, if they are called on the instance object
 
     if (arguments.size() != callable->arity()) {
         const char* args {callable->arity() == 1u ? "argument" : "arguments"};
@@ -303,18 +308,23 @@ std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Function<std
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(const ast::stmt::Struct<std::shared_ptr<object::Object>>* stmt) {
-    current_environment->define(stmt->name.get_lexeme(), nullptr);
-
     std::unordered_map<std::string, std::shared_ptr<object::Method>> methods;
 
     for (const auto& method : stmt->methods) {
-        methods[method->name.get_lexeme()] = object::cast<object::Method>(object::create_method(
-            method->name,
-            method->parameters,
-            method->body,
-            
-        ));
+        if (method->parameters.empty()) {
+            throw RuntimeError(stmt->name, "Methods must have an instance parameter; consider adding `self`");
+        }
+
+        methods[method->name.get_lexeme()] = object::cast<object::Method>(
+            object::create_method(
+                method->name,
+                method->parameters,
+                method->body
+            )
+        );
     }
+
+    current_environment->define(stmt->name.get_lexeme(), nullptr);
 
     std::shared_ptr<object::Object> struct_ {object::create_struct(stmt->name.get_lexeme(), methods)};
 
