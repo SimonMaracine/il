@@ -272,7 +272,7 @@ long long Scanner::parse_long_long(const std::string& string) {
     } catch (const std::invalid_argument&) {
         assert(false);
     } catch (const std::out_of_range&) {
-        ctx->error(line, "Number out of range");
+        ctx->error(line, "Integer value out of range");
         return 0ll;
     }
 
@@ -287,7 +287,7 @@ double Scanner::parse_double(const std::string& string) {
     } catch (const std::invalid_argument&) {
         assert(false);
     } catch (const std::out_of_range&) {
-        ctx->error(line, "Number out of range");
+        ctx->error(line, "Float value out of range");
         return 0.0;
     }
 

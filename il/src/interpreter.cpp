@@ -15,7 +15,10 @@ Interpreter::Interpreter(Context* ctx)
     global_environment.define("clock", object::create_builtin_function<builtins::clock>());
     global_environment.define("print", object::create_builtin_function<builtins::print>());
     global_environment.define("println", object::create_builtin_function<builtins::println>());
-    global_environment.define("to_string", object::create_builtin_function<builtins::to_string>());
+    global_environment.define("str", object::create_builtin_function<builtins::str>());
+    global_environment.define("int", object::create_builtin_function<builtins::int_>());
+    global_environment.define("float", object::create_builtin_function<builtins::float_>());
+    global_environment.define("input", object::create_builtin_function<builtins::input>());
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {
@@ -133,13 +136,13 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
             throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::Greater:
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value > object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value > object::cast<object::Float>(right)->value
                 );
             }
@@ -147,13 +150,13 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
             throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::GreaterEqual:
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value >= object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value >= object::cast<object::Float>(right)->value
                 );
             }
@@ -161,13 +164,13 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
             throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::Less:
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value < object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value < object::cast<object::Float>(right)->value
                 );
             }
@@ -175,13 +178,13 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
             throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::LessEqual:
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value <= object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value <= object::cast<object::Float>(right)->value
                 );
             }
@@ -189,32 +192,66 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
             throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
         case token::TokenType::BangEqual:
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value != object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value != object::cast<object::Float>(right)->value
                 );
             }
 
-            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
+            if (left->type == object::Type::None && right->type == object::Type::None) {
+                return object::create_bool(true);
+            }
+
+            if (left->type == object::Type::String && right->type == object::Type::String) {
+                return object::create_bool(
+                    object::cast<object::String>(left)->value == object::cast<object::String>(right)->value
+                );
+            }
+
+            if (left->type == object::Type::Boolean && right->type == object::Type::Boolean) {
+                return object::create_bool(
+                    object::cast<object::Boolean>(left)->value == object::cast<object::Boolean>(right)->value
+                );
+            }
+
+            return object::create_bool(false);
         case token::TokenType::EqualEqual:
+
+
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
-                return object::create_integer(
+                return object::create_bool(
                     object::cast<object::Integer>(left)->value == object::cast<object::Integer>(right)->value
                 );
             }
 
             if (left->type == object::Type::Float && right->type == object::Type::Float) {
-                return object::create_float(
+                return object::create_bool(
                     object::cast<object::Float>(left)->value == object::cast<object::Float>(right)->value
                 );
             }
 
-            throw RuntimeError(expr->operator_, "Operands must be either integers or floats");
+            if (left->type == object::Type::None && right->type == object::Type::None) {
+                return object::create_bool(true);
+            }
+
+            if (left->type == object::Type::String && right->type == object::Type::String) {
+                return object::create_bool(
+                    object::cast<object::String>(left)->value == object::cast<object::String>(right)->value
+                );
+            }
+
+            if (left->type == object::Type::Boolean && right->type == object::Type::Boolean) {
+                return object::create_bool(
+                    object::cast<object::Boolean>(left)->value == object::cast<object::Boolean>(right)->value
+                );
+            }
+
+            return object::create_bool(false);
         default:
             break;
     }
@@ -317,7 +354,7 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Call<std::shared_p
         );
     }
 
-    return callable->call(this, arguments);
+    return callable->call(this, arguments, expr->paren);
 }
 
 std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Get<std::shared_ptr<object::Object>>* expr) {

@@ -14,6 +14,8 @@ public:
     Interpreter(Context* ctx);
 
     void interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements);
+
+    Context* get_ctx() const { return ctx; }
 private:
     std::shared_ptr<object::Object> evaluate(std::shared_ptr<ast::expr::Expr<std::shared_ptr<object::Object>>> expr);
 

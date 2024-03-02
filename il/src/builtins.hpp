@@ -4,22 +4,71 @@
 
 namespace builtins {
     struct clock : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>&) override;
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>&,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
     };
 
     struct print : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
     };
 
     struct println : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
     };
 
-    struct to_string : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(Interpreter*, const std::vector<std::shared_ptr<object::Object>>& arguments) override;
+    struct str : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+
+        std::size_t arity() const override;
+    };
+
+    struct int_ : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(
+            Interpreter* interpreter,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+        std::size_t arity() const override;
+    };
+
+    struct float_ : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(
+            Interpreter* interpreter,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+
+        std::size_t arity() const override;
+    };
+
+    struct input : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
     };
 }

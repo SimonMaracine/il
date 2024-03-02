@@ -66,7 +66,11 @@ namespace object {
         return fields[name.get_lexeme()] = value;
     }
 
-    std::shared_ptr<Object> Function::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
+    std::shared_ptr<Object> Function::call(
+        Interpreter* interpreter,
+        const std::vector<std::shared_ptr<Object>>& arguments,
+        const token::Token&
+    ) {
         Environment environment {&interpreter->global_environment};
 
         // Create all the local variables
@@ -88,7 +92,11 @@ namespace object {
         return parameters.size();
     }
 
-    std::shared_ptr<Object> Struct::call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) {
+    std::shared_ptr<Object> Struct::call(
+        Interpreter* interpreter,
+        const std::vector<std::shared_ptr<Object>>& arguments,
+        const token::Token& token
+    ) {
         std::shared_ptr<StructInstance> instance {cast<StructInstance>(create_struct_instance(shared_from_this()))};
 
         // Bind the instance to the methods
@@ -103,7 +111,7 @@ namespace object {
         arguments_and_self.insert(arguments_and_self.cbegin(), instance);
 
         if (methods.find("init") != methods.cend()) {
-            methods.at("init")->call(interpreter, arguments_and_self);
+            methods.at("init")->call(interpreter, arguments_and_self, token);
         }
 
         return instance;

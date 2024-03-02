@@ -44,7 +44,12 @@ namespace object {
     struct Callable {
         virtual ~Callable() noexcept = default;
 
-        virtual std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) = 0;
+        virtual std::shared_ptr<Object> call(
+            Interpreter* interpreter,
+            const std::vector<std::shared_ptr<Object>>& arguments,
+            const token::Token& token
+        ) = 0;
+
         virtual std::size_t arity() const = 0;
     };
 
@@ -86,7 +91,12 @@ namespace object {
 
         std::string to_string() const override;
 
-        std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
+        std::shared_ptr<Object> call(
+            Interpreter* interpreter,
+            const std::vector<std::shared_ptr<Object>>& arguments,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
 
         token::Token name;
@@ -107,7 +117,12 @@ namespace object {
     struct Struct : Object, Callable, public std::enable_shared_from_this<Struct> {
         std::string to_string() const override;
 
-        std::shared_ptr<Object> call(Interpreter* interpreter, const std::vector<std::shared_ptr<Object>>& arguments) override;
+        std::shared_ptr<Object> call(
+            Interpreter* interpreter,
+            const std::vector<std::shared_ptr<Object>>& arguments,
+            const token::Token& token
+        ) override;
+
         std::size_t arity() const override;
 
         std::string name;
