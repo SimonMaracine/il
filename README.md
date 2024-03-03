@@ -25,8 +25,8 @@ a later section.
 
 IL, being just a hobby language, is not that big and it's far, far from complete. It features basic data types like
 integers, floats, booleans, strings, none (null type), but also aggregate types: structs. Because it is an imperative
-language, at its core are statements, which are instructions executed one after another, that produce side effects.
-Statements don't produce values. On the other hand, expressions do. Expressions are:
+language, at its core there are statements, which are instructions executed one after another, that produce side
+effects. Statements don't produce values. On the other hand, expressions do. Expressions are:
 
 - literal values (eg. numbers, strings, true, false),
 - combinations of those (eg. two numbers added or multiplied, two booleans and'ed),
@@ -56,6 +56,23 @@ Blocks, also called `scopes`, are also allowed anywhere. They affect variables' 
 declared inside a block cannot be accessed from outside that block, but it can be accessed from other inner blocks.
 Variables can be `shadowed` by other variables with the same name.
 
+```txt
+let var1 = "var1";
+
+println(var1);  // Prints `var1`
+
+{
+    let var2 = "var2";
+    let var1 = 5;
+
+    println(var2);  // Prints `var2`
+    println(var1);  // Prints `5`, the first var1 is shadowed
+}
+
+println(var2);  // Error, var2 is not defined
+println(var1);  // Prints `var1`
+```
+
 On the topic of variables, they are plain containers for any type of IL object. Variables are just `references` or
 pointers to objects in memory. Objects are managed by a `reference-counting` system. As long as an object has a
 reference somewhere, it stays alive. Care must be taken to not create circular references.
@@ -64,10 +81,11 @@ reference somewhere, it stays alive. Care must be taken to not create circular r
 let x;  // Value is none
 let number = 5;
 let name = "Simon";
+let name2 = name;  // References name from above
 ```
 
-IL is a `dynamically-typed` language, which means variables don't have a specific type associated to them at
-compile time and function parameter and return value types also don't have types. That spares the language for
+IL is a `dynamically-typed` language, which means variables don't have a specific type associated to them in the
+source code, and function parameter and return value types also don't have types. That spares the language for
 the need of `generics`.
 
 IL is also a `strongly-typed` language, because implicit convertions between types is not allowed. By design, you
@@ -118,9 +136,9 @@ identity("something");
 
 fun hello() {
     println("Hello");
-}  // Implicitly returns none
+}
 
-hello();
+hello();  // Implicitly returns none
 
 fun factorial(n) {
     if (n < 2)  {
