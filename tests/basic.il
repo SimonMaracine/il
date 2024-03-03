@@ -28,3 +28,13 @@ println(x);
 
 x = x + 1;
 println(x);
+
+let age = 21.7;
+
+if (age < 1.0) {
+    println("Newborn");
+} else if (age < 18.0) {
+    println("Child");
+} else {
+    println("Adult");
+}

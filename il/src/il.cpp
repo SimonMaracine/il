@@ -50,7 +50,7 @@ ___) (___| (____/\    | (____/\| )   ( || )  \  || (___) |
 )"
     );
 
-    std::cout << "\nil version " << VERSION_MAJOR << '.' << VERSION_MINOR << '.' << VERSION_PATCH << "\n\n";
+    std::cout << "\nIL version " << VERSION_MAJOR << '.' << VERSION_MINOR << '.' << VERSION_PATCH << "\n\n";
 
     while (true) {
         std::cout << ">> ";
