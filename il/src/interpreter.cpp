@@ -18,6 +18,7 @@ Interpreter::Interpreter(Context* ctx)
     global_environment.define("str", object::create_builtin_function<builtins::str>());
     global_environment.define("int", object::create_builtin_function<builtins::int_>());
     global_environment.define("float", object::create_builtin_function<builtins::float_>());
+    global_environment.define("bool", object::create_builtin_function<builtins::bool_>());
     global_environment.define("input", object::create_builtin_function<builtins::input>());
 }
 

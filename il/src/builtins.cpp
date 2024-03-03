@@ -165,6 +165,44 @@ namespace builtins {
         return 1u;
     }
 
+    std::shared_ptr<object::Object> bool_::call(
+        Interpreter*,
+        const std::vector<std::shared_ptr<object::Object>>& arguments,
+        const token::Token& token
+    ) {
+        auto argument {arguments[0u]};
+
+        switch (argument->type) {
+            case object::Type::None:
+                return object::create_bool(false);
+            case object::Type::String:
+                return object::create_bool(
+                    object::cast<object::String>(argument)->value.empty()
+                );
+            case object::Type::Integer:
+                return object::create_bool(
+                    object::cast<object::Integer>(argument)->value
+                );
+            case object::Type::Float:
+                return object::create_bool(
+                    object::cast<object::Float>(argument)->value
+                );
+            case object::Type::Boolean:
+                return object::create_bool(
+                    object::cast<object::Boolean>(argument)->value
+                );
+            default:
+                throw RuntimeError(token, "bool() argument must be either none, string, integer, float or boolean");
+        }
+
+        assert(false);
+        return nullptr;
+    }
+
+    std::size_t bool_::arity() const {
+        return 1u;
+    }
+
     std::shared_ptr<object::Object> input::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,

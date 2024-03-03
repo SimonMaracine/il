@@ -186,6 +186,7 @@ The standard library of IL is very, very anemic. It consists of a few builtin fu
 - str
 - int
 - float
+- bool
 - input
 
 print, println and input functions are the only ones for `IO`.
