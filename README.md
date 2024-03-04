@@ -16,7 +16,7 @@ function interface (FFI).
 well actually be a compiled language to bytecode or even to machine code. *How* it's implemented has nothing to
 do with the actual *language*.
 
-It is based on the second part of the amazing book [Crafting Interpreters](https://craftinginterpreters.com/)
+This project is based on the second part of the amazing book [Crafting Interpreters](https://craftinginterpreters.com/)
 by Robert Nystrom. IL is quite similar to the language created in the book, but it still ended up different
 from it in some regards. I'll talk about the differences in a later section.
 
@@ -24,10 +24,10 @@ from it in some regards. I'll talk about the differences in a later section.
 
 ### Expressions And Statements
 
-IL, being just a hobby language, is not that big and it's far, far from complete. It features basic data types like
-integers, floats, booleans, strings, none (null type), but also aggregate types: structs. Because it is an imperative
-language, at its core there are statements, which are instructions executed one after another, that produce side
-effects. Statements don't produce values. On the other hand, expressions do. Expressions are:
+IL features basic data types like integers, floats, booleans, strings, none (null type), but also aggregate types
+(structs) and a few special ones. Because it is an imperative language, at its core there are statements,
+instructions that are executed one after another, that produce side effects. Statements don't produce values.
+On the other hand, expressions do. Expressions are:
 
 - literal values (eg. numbers, strings, true, false),
 - combinations of those (eg. two numbers added or multiplied, two booleans and'ed),
@@ -180,7 +180,7 @@ Structs are similar to `classes` in other languages, as they contain both fields
 support `inheritance`, or `data hiding`. Structs are just a mutable bag of data. Attributes of instances of
 structs can be created dynamically. Attributes inside structs are accessed by a special mandatory parameter,
 the first one, that references the instance. This parameter is called *self* by convention. Structs don't support
-`static` fields or methods.
+`static` fields or methods. *init* is a special method that is called automatically when an object is created.
 
 ```txt
 struct Foo {}
@@ -235,6 +235,41 @@ The standard library of IL is very, very anemic. It consists of a few builtin fu
 
 print, println and input are the only functions that do `IO`.
 
+## Keywords
+
+This programming language has very few reserved words, only 14 in total, which should not be a surprise:
+
+- let
+- true
+- false
+- none
+- or
+- and
+- not
+- if
+- else
+- while
+- for
+- fun
+- return
+- struct
+
 ## What Is Missing Or What Could Be Added
 
+IL, being just a hobby language, is not that big and it's very far from complete. There are lots of things that
+could be added to improve the language and make it at least just a bit useful. Right now it's almost completely
+useless, because the only input an IL program can receive is from the stdin file and the only output it can give
+is through stdout. Some of the most important functionality that IL needs right now is:
+
+- File, sockets and pipes IO,
+- Command line arguments,
+- Process return value,
+- String operations,
+- Arrays, maps, sets,
+- Math functions,
+- Introspection,
+- Better error messages and
+- FFI for bidirectional communication between IL and C++ code.
+
 ## Inner Workings And Implementation
+
