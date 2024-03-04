@@ -254,6 +254,11 @@ This programming language has very few reserved words, only 14 in total, which s
 - return
 - struct
 
+## Interpreter Itself
+
+Besides executing scripts, IL's interpreter features a REPL (Read Evaluate Print Loop), which can be a quick and easy
+way to execute some temporary code.
+
 ## What Is Missing Or What Could Be Added
 
 IL, being just a hobby language, is not that big and it's very far from complete. There are lots of things that
@@ -267,9 +272,107 @@ is through stdout. Some of the most important functionality that IL needs right 
 - String operations,
 - Arrays, maps, sets,
 - Math functions,
+- Break and continue statements,
 - Introspection,
-- Better error messages and
+- Better error messages,
+- Imports and
 - FFI for bidirectional communication between IL and C++ code.
 
 ## Inner Workings And Implementation
 
+### Execution
+
+When IL executes a script, it goes through a series of stages from reading the source code, understanding its
+meaning and over to executing it.
+
+#### Lexing
+
+The first stage is called `lexing` or `scanning`, where it reads the source code character by character and converts it into
+a series of `tokens`, each having a type. Besides that, they can also contain data.
+
+For example, this statement:
+
+```txt
+let x = 2;
+```
+
+produces the following tokens:
+
+```txt
+Token::Let, Token::Identifier, Token::Equal, Token::Integer(2), Token::Semicolon
+```
+
+Note how the integer token contains the literal value.
+
+In formal language theory, here, characters represent `symbols` and tokens represent `strings`. The `alphabet` that
+IL uses contains only a subset of the ASCII characters.
+
+#### Parsing
+
+The second stage, `parsing`, goes through all the tokens previously generated and tries to make some sense of
+them by building an `abstract syntax tree` (AST). This tree represents the syntax of the language. Each node
+of this tree represents a statement or an expression in the language and it contains data related to it.
+
+There are many types of parsers, each having their strengths and weaknesses. IL, however, uses
+`recursive descent parsing`, which is not too complex to implement, while also being quite robust. Recursive descent
+becomes, as its name implies, a series of recursive functions used for iterating the tokens and building up
+the tree.
+
+A special document, called `lexical grammar`, formally describes the languages's syntax. The parser's code
+structure is closely tied to this document. Usually each production in the grammar has a corresponding
+function in the parser.
+
+In this stage, tokens correspond to symbols and a series of tokens correspond to strings.
+
+This abstract syntax tree can be used in a lot of ways and I'll talk about this in next.
+
+#### Analyzing
+
+The third stage that IL runs in its execution is actually optional and it can be split in many, many smaller steps.
+
+In this stage, the abstract syntax tree is traversed once or multiple times (depending on how many steps are there),
+each time being `analyzed` for errors according to some conditions, for statically resolving identifiers, or many
+other things. For example, here, statically-typed languages check their variable types. Or here, many languages detect
+and report warnings or errors. IL uses this step to ensure that return, function and struct statements are placed
+in valid positions.
+
+IDEs use this tree to colorize the code, to implement code completion, or to give instant feedback without needing
+to compile the code first.
+
+#### Interpreting
+
+The last stage is finally `interpreting` or executing the abstract syntax tree. This is the `runtime` part of
+the language. Here, objects are created, variables, functions and structs are defined, stuff is being executed
+and runtime erros are thrown.
+
+In every stage errors can appear. Thus, there are syntax and runtime errors.
+
+### Visitor Pattern
+
+For traversing the abstract syntax tree, I used the visitor pattern, which makes most of the project's code
+more structured and organized. This technique lets dispatching a process function called `visit` for every
+type of node in the tree by calling an `accept` function overriden in every node. In other words, it uses
+both dynamic and static polymorphism to add a layer of indirection in order to better organize the code.
+That is needed, because multiple classes (the analyzer, the interpreter etc.) need to process the tree.
+
+### Object System
+
+IL handles at runtime multiple objects: integers, floats, strings, booleans, functions, structs etc. In the
+early versions, I implemented the base type `Object` as a union between all the actual types. That wasn't a
+good idea, because those objects needed a lot to be passed and returned by value from functions, and because
+this way, each object occupied memory equal to the largest type. Now, IL represents its objects as a hierarchy,
+each object being dynamically-allocated. Passing and returning pointers doesnt pose a problem. But the disatvantage
+is that memory is now more fragmented and it's less cache friendly, slower to access. Still, this change was good,
+as shown in the following table:
+
+|               | Adding floats X 1,000,000 | Concatenating strings X 100,000 |
+|---------------|---------------------------|---------------------------------|
+| First method  | 5.789 seconds             | 10.997 seconds                  |
+| Second method | 4.697 seconds             | 3.407 seconds                   |
+
+For convenience, integers in IL are implemented as signed 64-bit integers, and floats as floating-points with double
+precision, 64-bit as well.
+
+Functions and structs are objects as well and they can be assigned to variables.
+
+### Optimizations
