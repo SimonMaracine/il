@@ -222,7 +222,7 @@ You can see by now that IL also looks pretty similar to the `Python` programming
 
 ## Standard Library
 
-The standard library of IL is very, very anemic. It consists of a few builtin functions:
+The standard library of IL is very, very anemic. It consists of just a few builtin functions:
 
 - clock
 - print
@@ -266,7 +266,7 @@ could be added to improve the language and make it at least just a bit useful. R
 useless, because the only input an IL program can receive is from the stdin file and the only output it can give
 is through stdout. Some of the most important functionality that IL needs right now is:
 
-- File, sockets and pipes IO,
+- File and sockets IO,
 - Command line arguments,
 - Process return value,
 - String operations,
@@ -280,7 +280,7 @@ is through stdout. Some of the most important functionality that IL needs right 
 
 ## Inner Workings And Implementation
 
-### Execution
+### Execution Pipeline
 
 When IL executes a script, it goes through a series of stages from reading the source code, understanding its
 meaning and over to executing it.
@@ -305,7 +305,7 @@ Token::Let, Token::Identifier, Token::Equal, Token::Integer(2), Token::Semicolon
 Note how the integer token contains the literal value.
 
 In formal language theory, here, characters represent `symbols` and tokens represent `strings`. The `alphabet` that
-IL uses contains only a subset of the ASCII characters.
+IL uses, contains only a subset of the ASCII characters.
 
 #### Parsing
 
@@ -324,7 +324,7 @@ function in the parser.
 
 In this stage, tokens correspond to symbols and a series of tokens correspond to strings.
 
-This abstract syntax tree can be used in a lot of ways and I'll talk about this in next.
+This abstract syntax tree can be used in a lot of ways. I'll talk about this shortly.
 
 #### Analyzing
 
@@ -342,10 +342,10 @@ to compile the code first.
 #### Interpreting
 
 Finally, the last stage is `interpreting` or executing the abstract syntax tree. This is the `runtime` part of
-the language. Here, objects are created, variables, functions and structs are defined, stuff is being executed
-and runtime erros are thrown.
+the language. Here, objects are created, variables, functions and structs are defined, things are calculated,
+stuff is executed and runtime errors are thrown.
 
-In every stage errors can appear. Thus, there are syntax and runtime errors.
+In either stage errors can appear. Thus, there are syntax and runtime errors.
 
 ### Visitor Pattern
 
@@ -359,10 +359,10 @@ That is needed, because multiple classes (the analyzer, the interpreter etc.) ne
 
 IL handles at runtime multiple objects: integers, floats, strings, booleans, functions, structs etc. In the
 early versions, I implemented the base type `Object` as a union between all the actual types. That wasn't a
-good idea, because those objects needed a lot to be passed and returned by value from functions, and because
-this way, each object occupied memory equal to the largest type. Now, IL represents its objects as a hierarchy,
-each object being dynamically-allocated. Passing and returning pointers doesnt pose a problem. But the disatvantage
-is that memory is now more fragmented and it's less cache friendly, slower to access. Still, this change was good,
+good idea, because those objects needed a lot to be passed and returned by value from functions, and each object
+occupied an amount of memory equal to the largest type. Now, however, IL represents its objects as a hierarchy,
+each object being dynamically-allocated. Passing and returning pointers doesn't pose a problem. But the disadvantage
+is that memory is now more fragmented, it's less cache friendly and slower to access. Still, this change was good,
 as shown in the following table:
 
 |               | Adding floats X 1,000,000 | Concatenating strings X 100,000 |
@@ -370,8 +370,15 @@ as shown in the following table:
 | First method  | 5.789 seconds             | 10.997 seconds                  |
 | Second method | 4.697 seconds             | 3.407 seconds                   |
 
-For convenience, integers in IL are implemented as signed 64-bit integers, and floats as floating-points with double
-precision, 64-bit as well.
+These tests were made with the `time` command on Linux. The interpreter was compiled in debug mode. It's
+obviously not the most scientific or professional performnace test, but it still conveys the general idea that
+dynamically-allocated objects are more appropriate in this language.
+
+I solved the problem of memory management by using C++'s `shared_ptr` smart pointer, to automatically delete
+unreachable objects.
+
+For convenience, integers in IL are implemented as signed 64-bit integers, and floats as floating-points with
+double precision, 64-bit as well.
 
 Functions and structs are objects as well and they can be assigned to variables.
 
