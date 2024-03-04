@@ -341,7 +341,7 @@ to compile the code first.
 
 #### Interpreting
 
-The last stage is finally `interpreting` or executing the abstract syntax tree. This is the `runtime` part of
+Finally, the last stage is `interpreting` or executing the abstract syntax tree. This is the `runtime` part of
 the language. Here, objects are created, variables, functions and structs are defined, stuff is being executed
 and runtime erros are thrown.
 
@@ -374,5 +374,8 @@ For convenience, integers in IL are implemented as signed 64-bit integers, and f
 precision, 64-bit as well.
 
 Functions and structs are objects as well and they can be assigned to variables.
+
+Structs are implemented as a `hash map` of strings (names) to objects (attributes). `Environments` are just hash
+maps too, but they are chained, thus implementing scopes.
 
 ### Optimizations
