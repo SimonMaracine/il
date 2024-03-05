@@ -106,12 +106,16 @@ IL is a `dynamically-typed` language, which means variables don't have a specifi
 declaration, in the source code, and function parameters and return values also don't have types. That spares
 the language for the need of `generics`.
 
-IL is also a `strongly-typed` language, because implicit convertions between types is not allowed. By design, you
+IL is also a `strongly-typed` language, because implicit conversions between types are not allowed. By design, you
 can't add a float to an integer, or you can't evaluate a number as a boolean. The reason for this is that it
 makes the language less error-prone, although more verbose.
 
 ```txt
-let x = 5 - 3.7;  // This is a runtime error
+let x = 5 - 3.7;  // Throws a runtime error
+
+// Choose one
+let x = float(5) - 3.7;
+let x = 5 - int(3.7);
 ```
 
 ### Control Flow
@@ -256,8 +260,11 @@ This programming language has very few reserved words, only 14 in total, which s
 
 ## Interpreter Itself
 
-Besides executing scripts, IL's interpreter features a REPL (Read Evaluate Print Loop), which can be a quick and easy
-way to execute some temporary code.
+Besides executing scripts, IL's interpreter features a `REPL (Read Evaluate Print Loop)`, which can be a quick and
+easy way to execute some temporary code.
+
+This project is cross-platform and it works on Linux and Windows. I tested it on `GCC 13.2` and on `MSVC 19.34`.
+The interpreter is written in `C++` version 17.
 
 ## What Is Missing Or What Could Be Added
 
@@ -392,9 +399,31 @@ and false should be singletons, because there is no point in being multiple obje
 Integers and strings could also be interned, to save on memory allocations.
 
 Using shared_ptr is not the best idea, because the reference increments and decrements are atomic, which we
-don't need to be. IL doesn't support multithreading. If it did, it probably needed a global mutex to only allow
+don't need to be. IL doesn't support multithreading. If it did, it probably needed a global mutex to allow only
 one thread to execute at a time.
 
 Currently, every object is allocated with the standard allocator, which is almost for sure `malloc`. This
 is, again, not great, because dynamic memory allocations are expensive. What should have been done instead is
 to use a custom allocator on top of the system one, that is optimized for many, small allocations.
+
+## Differences Between IL And Lox
+
+Lox is the programming language developed in the book *Crafting Interpreters* by Robert Nystrom. Although I went
+through all the chapters of the second part of the book, writing my own language, sometimes I chose to make
+things different from the book. Namely, the differences are:
+
+- IL has a few different keywords than Lox;
+- IL has both integers and floats, whereas Lox only has floats;
+- IL is strongly typed, Lox is a bit weaker;
+- IL has many more builtin functions than Lox;
+- IL replaced the print statement with the [print function](https://github.com/SimonMaracine/il/commit/7cce7d4332365aacf35fefbd5bd8743626181805);
+- Lox features closures, but IL doesn't have them;
+- Lox implements inheritance to its classes, IL is not object-oriented;
+- Lox has static variable resolution, IL doesn't.
+
+## EOF
+
+For a few years now I wished to try and make my own programming language. Systems programming is my favorite
+topic in computer science and programming languages, virtual machines and interpreters always caught my interest.
+I'm happy that now I managed to accomplish this dream of mine. I learned new things in the process. Probably,
+some day, I'll make a compiled language. I'm looking forward to it.
