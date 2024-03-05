@@ -378,8 +378,8 @@ as shown in the following table:
 | Second method | 4.697 seconds             | 3.407 seconds                   |
 
 These tests were made with the `time` command on Linux. The interpreter was compiled in debug mode. It's
-obviously not the most scientific or professional performnace benchmark, but it still conveys the general idea
-that dynamically-allocated objects are more appropriate in this language.
+obviously not the most scientific or professional performance benchmark (at all), but it still conveys the
+general idea that dynamically-allocated objects are more appropriate in this language.
 
 I solved the problem of memory management by using C++'s `shared_ptr` smart pointer, to automatically delete
 unreachable objects.
@@ -418,12 +418,12 @@ things different from the book. Namely, the differences are:
 - IL has many more builtin functions than Lox;
 - IL replaced the print statement with the [print function](https://github.com/SimonMaracine/il/commit/7cce7d4332365aacf35fefbd5bd8743626181805);
 - Lox features closures, but IL doesn't have them;
-- Lox implements inheritance to its classes, IL is not object-oriented;
+- Lox implements inheritance for its classes, IL is not object-oriented;
 - Lox has static variable resolution, IL doesn't.
 
 ## EOF
 
 For a few years now I wished to try and make my own programming language. Systems programming is my favorite
-topic in computer science and programming languages, virtual machines and interpreters always caught my interest.
-I'm happy that now I managed to accomplish this dream of mine. I learned new things in the process. Probably,
+topic in computer science, and programming languages, virtual machines and interpreters always caught my interest.
+I'm happy that now I managed to accomplish this dream. I learned new things in the process. Probably,
 some day, I'll make a compiled language. I'm looking forward to it.
