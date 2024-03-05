@@ -44,8 +44,8 @@ declarations, and `if` and `for` instructions. Statements are:
 
 ### Hello World
 
-IL programs or scripts don't have an `entry point` function. The execution begins from the first statement down to the
-last one, so function calls are allowed outside of functions.
+IL programs or scripts don't have an `entry point` function. The execution begins from the first statement down to
+the last one, so function calls are allowed outside of functions.
 
 A `Hello World` program in IL looks somewhat like this:
 
@@ -103,11 +103,11 @@ value = none;
 ```
 
 IL is a `dynamically-typed` language, which means variables don't have a specific type associated to them at
-declaration, in the source code, and function parameters and return values also don't have types. That spares
+declaration, in the source code, and function parameters and return values don't have types as well. That spares
 the language for the need of `generics`.
 
-IL is also a `strongly-typed` language, because implicit conversions between types are not allowed. By design, you
-can't add a float to an integer, or you can't evaluate a number as a boolean. The reason for this is that it
+IL is also a `strongly-typed` language, because implicit conversions between types are not allowed. *By design*,
+you can't add a float to an integer, or you can't evaluate a number as a boolean. The reason for this is that it
 makes the language less error-prone, although more verbose.
 
 ```txt
@@ -263,8 +263,8 @@ This programming language has very few reserved words, only 14 in total, which s
 Besides executing scripts, IL's interpreter features a `REPL (Read Evaluate Print Loop)`, which can be a quick and
 easy way to execute some temporary code.
 
-This project is cross-platform and it works on Linux and Windows. I tested it on `GCC 13.2` and on `MSVC 19.34`.
-The interpreter is written in `C++` version 17.
+This project is cross-platform and it works on `Linux` and `Windows`. I tested it on `GCC 13.2` and on `MSVC 19.34`.
+The interpreter is written in C++ version 17.
 
 ## What Is Missing Or What Could Be Added
 
@@ -285,6 +285,8 @@ is through stdout. Some of the most important functionality that IL needs right 
 - Imports and
 - FFI for bidirectional communication between IL and C++ code.
 
+If all of these things were implemented in IL, then I would consider it a solid enough scripting language.
+
 ## Inner Workings And Implementation
 
 ### Execution Pipeline
@@ -294,8 +296,8 @@ meaning and over to executing it.
 
 #### Lexing
 
-The first stage is called `lexing` or `scanning`, where it reads the source code character by character and converts it into
-a series of `tokens`, each having a type. Besides that, they can also contain data.
+The first stage is called `lexing` or `scanning`, where it reads the source code character by character and converts
+it into a series of `tokens`, each having a type. Besides that, they can also contain data.
 
 For example, this statement:
 
@@ -398,7 +400,7 @@ There are many, many things that can be improved in this language implementation
 and false should be singletons, because there is no point in being multiple objects with the value true or none.
 Integers and strings could also be interned, to save on memory allocations.
 
-Using shared_ptr is not the best idea, because the reference increments and decrements are atomic, which we
+Using shared_ptr is not the best idea, because the reference increments and decrements are `atomic`, which we
 don't need to be. IL doesn't support multithreading. If it did, it probably needed a global mutex to allow only
 one thread to execute at a time.
 
@@ -414,7 +416,7 @@ things different from the book. Namely, the differences are:
 
 - IL has a few different keywords than Lox;
 - IL has both integers and floats, whereas Lox only has floats;
-- IL is strongly typed, Lox is a bit weaker;
+- IL is strongly typed, Lox is weaker;
 - IL has many more builtin functions than Lox;
 - IL replaced the print statement with the [print function](https://github.com/SimonMaracine/il/commit/7cce7d4332365aacf35fefbd5bd8743626181805);
 - Lox features closures, but IL doesn't have them;
@@ -425,5 +427,5 @@ things different from the book. Namely, the differences are:
 
 For a few years now I wished to try and make my own programming language. Systems programming is my favorite
 topic in computer science, and programming languages, virtual machines and interpreters always caught my interest.
-I'm happy that now I managed to accomplish this dream. I learned new things in the process. Probably,
-some day, I'll make a compiled language. I'm looking forward to it.
+I'm happy that now I managed to accomplish this dream. I learned some new things in the process. Probably,
+some day, I'll make a compiled language and I'm looking forward to it.
