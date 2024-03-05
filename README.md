@@ -371,8 +371,8 @@ as shown in the following table:
 | Second method | 4.697 seconds             | 3.407 seconds                   |
 
 These tests were made with the `time` command on Linux. The interpreter was compiled in debug mode. It's
-obviously not the most scientific or professional performnace test, but it still conveys the general idea that
-dynamically-allocated objects are more appropriate in this language.
+obviously not the most scientific or professional performnace benchmark, but it still conveys the general idea
+that dynamically-allocated objects are more appropriate in this language.
 
 I solved the problem of memory management by using C++'s `shared_ptr` smart pointer, to automatically delete
 unreachable objects.
@@ -386,3 +386,15 @@ Structs are implemented as a `hash map` of strings (names) to objects (attribute
 maps too, but they are chained, thus implementing scopes.
 
 ### Optimizations
+
+There are many, many things that can be improved in this language implementation. Constants like none, true
+and false should be singletons, because there is no point in being multiple objects with the value true or none.
+Integers and strings could also be interned, to save on memory allocations.
+
+Using shared_ptr is not the best idea, because the reference increments and decrements are atomic, which we
+don't need to be. IL doesn't support multithreading. If it did, it probably needed a global mutex to only allow
+one thread to execute at a time.
+
+Currently, every object is allocated with the standard allocator, which is almost for sure `malloc`. This
+is, again, not great, because dynamic memory allocations are expensive. What should have been done instead is
+to use a custom allocator on top of the system one, that is optimized for many, small allocations.
