@@ -81,6 +81,33 @@ namespace builtins {
         return 1u;
     }
 
+    std::shared_ptr<object::Object> input::call(
+        Interpreter*,
+        const std::vector<std::shared_ptr<object::Object>>& arguments,
+        const token::Token&
+    ) {
+        std::cout << arguments[0u]->to_string();
+
+        std::string buffer;
+        std::getline(std::cin, buffer);
+
+        if (std::cin.eof()) {
+            std::cin.clear();
+            return object::create_string("");
+        }
+
+        if (std::cin.bad()) {
+            std::cin.clear();
+            return object::create_string("");
+        }
+
+        return object::create_string(buffer);
+    }
+
+    std::size_t input::arity() const {
+        return 1u;
+    }
+
     std::shared_ptr<object::Object> str::call(
         Interpreter*,
         const std::vector<std::shared_ptr<object::Object>>& arguments,
@@ -200,33 +227,6 @@ namespace builtins {
     }
 
     std::size_t bool_::arity() const {
-        return 1u;
-    }
-
-    std::shared_ptr<object::Object> input::call(
-        Interpreter*,
-        const std::vector<std::shared_ptr<object::Object>>& arguments,
-        const token::Token&
-    ) {
-        std::cout << arguments[0u]->to_string();
-
-        std::string buffer;
-        std::getline(std::cin, buffer);
-
-        if (std::cin.eof()) {
-            std::cin.clear();
-            return object::create_string("");
-        }
-
-        if (std::cin.bad()) {
-            std::cin.clear();
-            return object::create_string("");
-        }
-
-        return object::create_string(buffer);
-    }
-
-    std::size_t input::arity() const {
         return 1u;
     }
 }

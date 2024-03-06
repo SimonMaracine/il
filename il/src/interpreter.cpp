@@ -15,11 +15,11 @@ Interpreter::Interpreter(Context* ctx)
     global_environment.define("clock", object::create_builtin_function<builtins::clock>());
     global_environment.define("print", object::create_builtin_function<builtins::print>());
     global_environment.define("println", object::create_builtin_function<builtins::println>());
+    global_environment.define("input", object::create_builtin_function<builtins::input>());
     global_environment.define("str", object::create_builtin_function<builtins::str>());
     global_environment.define("int", object::create_builtin_function<builtins::int_>());
     global_environment.define("float", object::create_builtin_function<builtins::float_>());
     global_environment.define("bool", object::create_builtin_function<builtins::bool_>());
-    global_environment.define("input", object::create_builtin_function<builtins::input>());
 }
 
 void Interpreter::interpret(const std::vector<std::shared_ptr<ast::stmt::Stmt<std::shared_ptr<object::Object>>>>& statements) {

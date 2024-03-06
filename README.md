@@ -227,11 +227,11 @@ The standard library of IL is very, very anemic. It consists of just a few built
 - clock
 - print
 - println
+- input
 - str
 - int
 - float
 - bool
-- input
 
 print, println and input are the only functions that do `IO`.
 

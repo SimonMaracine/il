@@ -33,6 +33,16 @@ namespace builtins {
         std::size_t arity() const override;
     };
 
+    struct input : object::BuiltinFunction {
+        std::shared_ptr<object::Object> call(
+            Interpreter*,
+            const std::vector<std::shared_ptr<object::Object>>& arguments,
+            const token::Token&
+        ) override;
+
+        std::size_t arity() const override;
+    };
+
     struct str : object::BuiltinFunction {
         std::shared_ptr<object::Object> call(
             Interpreter*,
@@ -67,16 +77,6 @@ namespace builtins {
             Interpreter*,
             const std::vector<std::shared_ptr<object::Object>>& arguments,
             const token::Token& token
-        ) override;
-
-        std::size_t arity() const override;
-    };
-
-    struct input : object::BuiltinFunction {
-        std::shared_ptr<object::Object> call(
-            Interpreter*,
-            const std::vector<std::shared_ptr<object::Object>>& arguments,
-            const token::Token&
         ) override;
 
         std::size_t arity() const override;
