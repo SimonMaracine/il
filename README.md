@@ -308,10 +308,10 @@ let x = 2;
 produces the following tokens:
 
 ```txt
-Token::Let, Token::Identifier, Token::Equal, Token::Integer(2), Token::Semicolon
+Token::Let, Token::Identifier("x"), Token::Equal, Token::Integer(2), Token::Semicolon
 ```
 
-Note how the integer token contains the literal value.
+Note how the identifier and integer tokens contain their respective literal values.
 
 In formal language theory, here, characters represent `symbols` and tokens represent `strings`. The `alphabet` that
 IL uses, contains only a subset of the ASCII characters.
