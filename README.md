@@ -397,8 +397,8 @@ maps too, but they are chained, thus implementing scopes.
 ### Optimizations
 
 There are many, many things that can be improved in this language implementation. Constants like none, true
-and false should be singletons, because there is no point in being multiple objects with the value true or none.
-Integers and strings could also be interned, to save on memory allocations.
+and false should be singletons, because there is no point in being multiple objects with symbolic values like true
+or false. Integers and strings could also be interned, to save on memory allocations.
 
 Using shared_ptr is not the best idea, because the reference increments and decrements are `atomic`, which we
 don't need to be. IL doesn't support multithreading. If it did, it probably needed a global mutex to allow only
@@ -410,7 +410,7 @@ to use a custom allocator on top of the system one, that is optimized for many, 
 
 ## Differences Between IL And Lox
 
-Lox is the programming language developed in the book *Crafting Interpreters* by Robert Nystrom. Although I went
+*Lox* is the programming language developed in the book *Crafting Interpreters* by Robert Nystrom. Although I went
 through all the chapters of the second part of the book, writing my own language, sometimes I chose to make
 things different from the book. Namely, the differences are:
 
