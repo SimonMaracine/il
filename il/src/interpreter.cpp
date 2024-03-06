@@ -222,8 +222,6 @@ std::shared_ptr<object::Object> Interpreter::visit(ast::expr::Binary<std::shared
 
             return object::create_bool(false);
         case token::TokenType::EqualEqual:
-
-
             if (left->type == object::Type::Integer && right->type == object::Type::Integer) {
                 return object::create_bool(
                     object::cast<object::Integer>(left)->value == object::cast<object::Integer>(right)->value
