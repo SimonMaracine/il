@@ -12,7 +12,7 @@ language. To be more exact, the core language features (data types, functions, s
 sufficient, but its standard library, builtin functions, is severely lacking, and it's also missing a foreign
 function interface (FFI).
 
-*IL* here stands for *Interpreted Language*. Although IL is *implemented* as an interpreted language, it could very
+*IL* here stands for *Interpreted Language*. Although it is *implemented* as an interpreted language, it could very
 well actually be a compiled language to bytecode or even to machine code. *How* it's implemented has nothing to
 do with the actual *language*.
 
@@ -320,7 +320,7 @@ IL uses, contains only a subset of the ASCII characters.
 
 The second stage, `parsing`, goes through all the tokens previously generated and tries to make some sense of
 them by building an `abstract syntax tree` (AST). This tree represents the syntax of the language. Each node
-of this tree represents a statement or an expression in the language and it contains data related to it.
+in this tree represents a statement or an expression and contains data related to it.
 
 There are many types of parsers, each having their strengths and weaknesses. IL, however, uses
 `recursive descent parsing`, which is not too complex to implement, while also being quite robust. Recursive descent
