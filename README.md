@@ -278,7 +278,7 @@ is through stdout. Some of the most important functionality that IL needs right 
 - Process return value,
 - String operations,
 - Arrays, maps, sets,
-- Math functions,
+- Math functions and operators,
 - Break and continue statements,
 - Introspection,
 - Better error messages,
@@ -408,8 +408,21 @@ Currently, every object is allocated with the standard allocator, which is almos
 is, again, not great, because dynamic memory allocations are expensive. What should have been done instead is
 to use a custom allocator on top of the system one, that is optimized for many, small allocations.
 
-Both `parsing synchronization` and return statements are implemented with exceptions, which is no great, as throwing
+Both `parsing synchronization` and return statements are implemented with exceptions. This is not good, as throwing
 exceptions is very costly.
+
+The only optimizations that I got around to implement is interning. none singleton, booleans and integers in
+the range `[-5, 256]` are preallocated. After that I did some unprofessional benchmarks again, this time running
+the script *heavy.il* in release mode. These are the results:
+
+|                                      | heavy.il      |
+|--------------------------------------|---------------|
+| No Interning                         | 1.321 seconds |
+| Interned booleans, integers and none | 1.309 seconds |
+
+The difference is not huge, because the benchmarked script does most of its calculations with large numbers.
+That difference in time mostly comes from the interned booleans. If I had written a script that runs calculations
+only on small integers, the difference would have been more noticeable.
 
 ## Differences Between IL And Lox
 
