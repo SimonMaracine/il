@@ -65,7 +65,7 @@ std::string AstPrinter::visit(ast::expr::Logical<std::string>* expr) {
     return parenthesize(expr->operator_.get_lexeme(), {expr->left, expr->right});
 }
 
-std::string AstPrinter::visit(ast::expr::Call<std::string>* expr) {
+std::string AstPrinter::visit([[maybe_unused]] ast::expr::Call<std::string>* expr) {
     // return parenthesize("call", {expr->callee->accept(this), expr->arguments});  // FIXME
     return {};
 }
@@ -78,34 +78,34 @@ std::string AstPrinter::visit(ast::expr::Set<std::string>* expr) {
     return parenthesize("set", {expr->name.get_lexeme(), expr->object->accept(this), expr->value->accept(this)});
 }
 
-std::string AstPrinter::visit(const ast::stmt::Expression<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Expression<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::Let<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Let<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::Function<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Function<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::Struct<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Struct<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::If<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::If<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::While<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::While<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::Block<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Block<std::string>* stmt) {
     return {};
 }
 
-std::string AstPrinter::visit(const ast::stmt::Return<std::string>* stmt) {
+std::string AstPrinter::visit([[maybe_unused]] const ast::stmt::Return<std::string>* stmt) {
     return {};
 }

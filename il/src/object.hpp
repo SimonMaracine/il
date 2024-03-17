@@ -20,6 +20,10 @@ namespace ast {
 }
 
 namespace object {
+    namespace interned {
+        void initialize();
+    }
+
     enum class Type {
         None,
         String,

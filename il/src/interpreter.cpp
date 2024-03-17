@@ -12,6 +12,8 @@
 
 Interpreter::Interpreter(Context* ctx)
     : current_environment(&global_environment), ctx(ctx) {
+    object::interned::initialize();
+
     global_environment.define("clock", object::create_builtin_function<builtins::clock>());
     global_environment.define("print", object::create_builtin_function<builtins::print>());
     global_environment.define("println", object::create_builtin_function<builtins::println>());

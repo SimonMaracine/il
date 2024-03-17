@@ -10,6 +10,36 @@
 #include "runtime_error.hpp"
 
 namespace object {
+    namespace interned {
+        static std::shared_ptr<None> none;
+        static std::shared_ptr<Boolean> true_;
+        static std::shared_ptr<Boolean> false_;
+        static std::shared_ptr<Integer> integers[262u];
+
+        static constexpr long long INTEGER_MIN {-5ll};
+        static constexpr long long INTEGER_MAX {256ll};
+        static constexpr long long INTEGER_OFFSET {5ll};
+
+        void initialize() {
+            none = std::make_shared<None>();
+            none->type = Type::None;
+
+            true_ = std::make_shared<Boolean>();
+            true_->type = Type::Boolean;
+            true_->value = true;
+
+            false_ = std::make_shared<Boolean>();
+            false_->type = Type::Boolean;
+            false_->value = false;
+
+            for (long long i {INTEGER_MIN}; i <= INTEGER_MAX; i++) {
+                integers[i + INTEGER_OFFSET] = std::make_shared<Integer>();
+                integers[i + INTEGER_OFFSET]->type = Type::Integer;
+                integers[i + INTEGER_OFFSET]->value = i;
+            }
+        }
+    }
+
     std::string None::to_string() const {
         return "none";
     }
@@ -126,10 +156,7 @@ namespace object {
     }
 
     std::shared_ptr<Object> create_none() {
-        std::shared_ptr<None> object {std::make_shared<None>()};
-        object->type = Type::None;
-
-        return object;
+        return interned::none;
     }
 
     std::shared_ptr<Object> create_string(const std::string& value) {
@@ -141,6 +168,10 @@ namespace object {
     }
 
     std::shared_ptr<Object> create_integer(long long value) {
+        if (value >= interned::INTEGER_MIN && value <= interned::INTEGER_MAX) {
+            return interned::integers[value + interned::INTEGER_OFFSET];
+        }
+
         std::shared_ptr<Integer> object {std::make_shared<Integer>()};
         object->type = Type::Integer;
         object->value = value;
@@ -157,11 +188,7 @@ namespace object {
     }
 
     std::shared_ptr<Object> create_bool(bool value) {
-        std::shared_ptr<Boolean> object {std::make_shared<Boolean>()};
-        object->type = Type::Boolean;
-        object->value = value;
-
-        return object;
+        return value ? interned::true_ : interned::false_;
     }
 
     std::shared_ptr<Object> create_function(
