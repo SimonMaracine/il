@@ -417,7 +417,7 @@ the script *heavy.il* in release mode. These are the results:
 
 |                                      | heavy.il      |
 |--------------------------------------|---------------|
-| No Interning                         | 1.321 seconds |
+| No interning                         | 1.321 seconds |
 | Interned booleans, integers and none | 1.309 seconds |
 
 The difference is not huge, because the benchmarked script does most of its calculations with large numbers.
