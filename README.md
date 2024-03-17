@@ -408,6 +408,9 @@ Currently, every object is allocated with the standard allocator, which is almos
 is, again, not great, because dynamic memory allocations are expensive. What should have been done instead is
 to use a custom allocator on top of the system one, that is optimized for many, small allocations.
 
+Both `parsing synchronization` and return statements are implemented with exceptions, which is no great, as throwing
+exceptions is very costly.
+
 ## Differences Between IL And Lox
 
 *Lox* is the programming language developed in the book *Crafting Interpreters* by Robert Nystrom. Although I went
