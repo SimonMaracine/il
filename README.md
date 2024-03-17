@@ -444,4 +444,4 @@ things different from the book. Namely, the differences are:
 For a few years now I wished to try and make my own programming language. Systems programming is my favorite
 topic in computer science, and programming languages, virtual machines and interpreters always caught my interest.
 I'm happy that now I managed to accomplish this dream. I learned some new things in the process. Probably,
-some day, I'll make a compiled language and I'm looking forward to it.
+some day, I'll make a compiled language. I'm looking forward to it.
