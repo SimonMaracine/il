@@ -22,7 +22,7 @@ private:
     void add_token(token::TokenType type, double value);
     bool match(char character);
     char peek();
-    char peekTwo();
+    char peek_two();
     bool reached_end();
     bool is_digit(char character);
     bool is_alpha(char character);

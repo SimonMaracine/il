@@ -191,7 +191,7 @@ struct Foo {}
 
 let foo = Foo();  // Create an instance of the struct by calling its name
 
-foo.some_data = 5;  // You might think already that I have an obsession with the number five, I don't
+foo.some_data = 5;  // Another five
 println(foo.some_data);
 
 let foo2 = Foo();  // A brand new object
@@ -308,7 +308,7 @@ let x = 2;
 produces the following tokens:
 
 ```txt
-Token::Let, Token::Identifier("x"), Token::Equal, Token::Integer(2), Token::Semicolon
+Let, Identifier("x"), Equal, Integer(2), Semicolon
 ```
 
 Note how the identifier and integer tokens contain their respective literal values.

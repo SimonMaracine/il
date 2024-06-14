@@ -151,7 +151,7 @@ char Scanner::peek() {
     return source_code[current];
 }
 
-char Scanner::peekTwo() {
+char Scanner::peek_two() {
     if (current + 1u >= source_code.length()) {
         return 0;
     }
@@ -214,7 +214,7 @@ void Scanner::number() {
 
     bool floating_point {false};
 
-    if (peek() == '.' && is_digit(peekTwo())) {
+    if (peek() == '.' && is_digit(peek_two())) {
         floating_point = true;
 
         // Consume the dot
